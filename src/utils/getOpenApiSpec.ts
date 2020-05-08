@@ -22,7 +22,6 @@ function read(filePath: string): string {
  */
 export function getOpenApiSpec(input: string): any {
     const file = path.resolve(process.cwd(), input);
-    const extname = path.extname(file).toLowerCase();
     const content = read(file);
 
     try {

@@ -43,8 +43,7 @@ export function generate({
     write = true,
 }: Options): void {
     try {
-        // Load the specification, read the OpenAPI version and load the
-        // handlebar templates for the given language
+        // Load the specification, load the handlebar templates for the given language
         const openApi = isString(input) ? getOpenApiSpec(input) : input;
         const templates = readHandlebarsTemplates();
 
