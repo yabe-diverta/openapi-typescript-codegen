@@ -2,9 +2,7 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
-
 import { Client } from '../client/interfaces/Client';
-import { HttpClient } from '../index';
 import { Templates } from './readHandlebarsTemplates';
 import { writeClientIndex } from './writeClientIndex';
 import { writeClientModels } from './writeClientModels';
@@ -21,7 +19,6 @@ function copySupportFile(filePath: string, outputPath: string): void {
  * @param client Client object with all the models, services, etc.
  * @param templates Templates wrapper with all loaded Handlebars templates.
  * @param output Directory to write the generated files to.
- * @param httpClient The selected httpClient (fetch or XHR).
  * @param useOptions Use options or arguments functions.
  * @param exportCore: Generate core.
  * @param exportServices: Generate services.
@@ -32,7 +29,6 @@ export function writeClient(
     client: Client,
     templates: Templates,
     output: string,
-    httpClient: HttpClient,
     useOptions: boolean,
     exportCore: boolean,
     exportServices: boolean,
@@ -59,13 +55,12 @@ export function writeClient(
         copySupportFile('core/request.ts', outputPath);
         copySupportFile('core/RequestOptions.ts', outputPath);
         copySupportFile('core/requestUsingFetch.ts', outputPath);
-        copySupportFile('core/requestUsingXHR.ts', outputPath);
         copySupportFile('core/Result.ts', outputPath);
     }
 
     if (exportServices) {
         mkdirp.sync(outputPathServices);
-        writeClientSettings(client, templates, outputPathCore, httpClient);
+        writeClientSettings(client, templates, outputPathCore);
         writeClientServices(client.services, templates, outputPathServices, useOptions);
     }
 

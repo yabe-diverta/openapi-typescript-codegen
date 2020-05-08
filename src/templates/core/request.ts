@@ -8,7 +8,6 @@ import { getQueryString } from './getQueryString';
 import { OpenAPI } from './OpenAPI';
 import { RequestOptions } from './RequestOptions';
 import { requestUsingFetch } from './requestUsingFetch';
-import { requestUsingXHR } from './requestUsingXHR';
 import { Result } from './Result';
 
 /**
@@ -64,12 +63,7 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
     }
 
     try {
-        switch (OpenAPI.CLIENT) {
-            case 'xhr':
-                return await requestUsingXHR(url, request, options.responseHeader);
-            default:
-                return await requestUsingFetch(url, request, options.responseHeader);
-        }
+        return await requestUsingFetch(url, request, options.responseHeader);
     } catch (error) {
         return {
             url,

@@ -7,7 +7,6 @@ describe('generation', () => {
         OpenAPI.generate({
             input: './test/mock/v3/spec.json',
             output: './test/result/v3/',
-            httpClient: OpenAPI.HttpClient.FETCH,
             useOptions: true,
             useUnionTypes: true,
             exportCore: true,

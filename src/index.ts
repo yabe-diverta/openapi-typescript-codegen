@@ -5,15 +5,9 @@ import { postProcessClient } from './utils/postProcessClient';
 import { readHandlebarsTemplates } from './utils/readHandlebarsTemplates';
 import { writeClient } from './utils/writeClient';
 
-export enum HttpClient {
-    FETCH = 'fetch',
-    XHR = 'xhr',
-}
-
 export interface Options {
     input: string | Record<string, any>;
     output: string;
-    httpClient?: HttpClient;
     useOptions?: boolean;
     useUnionTypes?: boolean;
     exportCore?: boolean;
@@ -29,7 +23,6 @@ export interface Options {
  * service layer, etc.
  * @param input The relative location of the OpenAPI spec.
  * @param output The relative location of the output directory.
- * @param httpClient The selected httpClient (fetch or XHR).
  * @param useOptions Use options or arguments functions.
  * @param useUnionTypes Use inclusive union types.
  * @param exportCore: Generate core client classes.
@@ -41,7 +34,6 @@ export interface Options {
 export function generate({
     input,
     output,
-    httpClient = HttpClient.FETCH,
     useOptions = false,
     useUnionTypes = false,
     exportCore = true,
@@ -59,7 +51,7 @@ export function generate({
         const client = parseV3(openApi);
         const clientFinal = postProcessClient(client, useUnionTypes);
         if (write) {
-            writeClient(clientFinal, templates, output, httpClient, useOptions, exportCore, exportServices, exportModels, exportSchemas);
+            writeClient(clientFinal, templates, output, useOptions, exportCore, exportServices, exportModels, exportSchemas);
         }
     } catch (e) {
         console.error(e);
