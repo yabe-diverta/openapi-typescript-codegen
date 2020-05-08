@@ -1,7 +1,5 @@
-import { parse as parseV2 } from './openApi/v2';
 import { parse as parseV3 } from './openApi/v3';
 import { getOpenApiSpec } from './utils/getOpenApiSpec';
-import { getOpenApiVersion, OpenApiVersion } from './utils/getOpenApiVersion';
 import { isString } from './utils/isString';
 import { postProcessClient } from './utils/postProcessClient';
 import { readHandlebarsTemplates } from './utils/readHandlebarsTemplates';
@@ -56,27 +54,12 @@ export function generate({
         // Load the specification, read the OpenAPI version and load the
         // handlebar templates for the given language
         const openApi = isString(input) ? getOpenApiSpec(input) : input;
-        const openApiVersion = getOpenApiVersion(openApi);
         const templates = readHandlebarsTemplates();
 
-        switch (openApiVersion) {
-            case OpenApiVersion.V2: {
-                const client = parseV2(openApi);
-                const clientFinal = postProcessClient(client, useUnionTypes);
-                if (write) {
-                    writeClient(clientFinal, templates, output, httpClient, useOptions, exportCore, exportServices, exportModels, exportSchemas);
-                }
-                break;
-            }
-
-            case OpenApiVersion.V3: {
-                const client = parseV3(openApi);
-                const clientFinal = postProcessClient(client, useUnionTypes);
-                if (write) {
-                    writeClient(clientFinal, templates, output, httpClient, useOptions, exportCore, exportServices, exportModels, exportSchemas);
-                }
-                break;
-            }
+        const client = parseV3(openApi);
+        const clientFinal = postProcessClient(client, useUnionTypes);
+        if (write) {
+            writeClient(clientFinal, templates, output, httpClient, useOptions, exportCore, exportServices, exportModels, exportSchemas);
         }
     } catch (e) {
         console.error(e);

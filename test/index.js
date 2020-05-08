@@ -19,16 +19,6 @@ function compile(dir) {
 }
 
 OpenAPI.generate({
-    input: './test/mock/v2/spec.json',
-    output: './test/result/v2/',
-    httpClient: OpenAPI.HttpClient.FETCH,
-    useOptions: true,
-    useUnionTypes: true,
-    exportSchemas: true,
-    exportServices: true,
-});
-
-OpenAPI.generate({
     input: './test/mock/v3/spec.json',
     output: './test/result/v3/',
     httpClient: OpenAPI.HttpClient.FETCH,
@@ -38,5 +28,4 @@ OpenAPI.generate({
     exportServices: true,
 });
 
-compile('./test/result/v2/');
 compile('./test/result/v3/');
