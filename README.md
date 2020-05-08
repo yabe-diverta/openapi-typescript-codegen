@@ -13,7 +13,6 @@
 -   Frontend ❤️ OpenAPI, but we do not want to use JAVA codegen in our builds.
 -   Quick, lightweight, robust and framework agnostic.
 -   Supports generation of Typescript clients.
--   Supports JSON and YAML files for input.
 
 ## Known issues:
 

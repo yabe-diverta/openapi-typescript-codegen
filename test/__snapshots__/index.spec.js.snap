@@ -70,7 +70,6 @@ exports[`generation v3 file(./test/result/v3/core/OpenAPI.ts): ./test/result/v3/
 interface Config {
 BASE: string;
 VERSION: string;
-CLIENT: 'fetch';
 TOKEN: string;
 }
 

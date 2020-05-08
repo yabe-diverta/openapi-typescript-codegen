@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as yaml from 'js-yaml';
 import * as path from 'path';
 
 /**
@@ -18,29 +17,17 @@ function read(filePath: string): string {
 }
 
 /**
- * Load and parse te open api spec. If the file extension is ".yml" or ".yaml"
- * we will try to parse the file as a YAML spec, otherwise we will fallback
- * on parsing the file as JSON.
+ * Load and parse to open api spec (JSON format only supported).
  * @param input
  */
 export function getOpenApiSpec(input: string): any {
     const file = path.resolve(process.cwd(), input);
     const extname = path.extname(file).toLowerCase();
     const content = read(file);
-    switch (extname) {
-        case '.yml':
-        case '.yaml':
-            try {
-                return yaml.safeLoad(content);
-            } catch (e) {
-                throw new Error(`Could not parse OpenApi YAML: "${file}"`);
-            }
 
-        default:
-            try {
-                return JSON.parse(content);
-            } catch (e) {
-                throw new Error(`Could not parse OpenApi JSON: "${file}"`);
-            }
+    try {
+        return JSON.parse(content);
+    } catch (e) {
+        throw new Error(`Could not parse OpenApi JSON: "${file}"`);
     }
 }
