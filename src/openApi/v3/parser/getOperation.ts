@@ -12,11 +12,12 @@ import { getOperationResponses } from './getOperationResponses';
 import { getOperationResults } from './getOperationResults';
 import { getServiceClassName } from './getServiceClassName';
 import { sortByRequired } from './sortByRequired';
+import { getOperationNameFallback } from './getOperationNameFallback';
 
 export function getOperation(openApi: OpenApi, url: string, method: string, op: OpenApiOperation): Operation {
     const serviceName = (op.tags && op.tags[0]) || 'Service';
     const serviceClassName = getServiceClassName(serviceName);
-    const operationNameFallback = `${method}${serviceClassName}`;
+    const operationNameFallback = getOperationNameFallback([method, serviceClassName, url]);
     const operationName = getOperationName(op.operationId || operationNameFallback);
     const operationPath = getOperationPath(url);
 

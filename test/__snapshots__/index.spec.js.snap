@@ -1910,6 +1910,8 @@ exports[`generation v3 file(./test/result/v3/services/ComplexService.ts): ./test
 /* eslint-disable */
 /* prettier-ignore */
 
+
+
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
 import { ModelWithArray } from '../models/ModelWithArray';
@@ -2009,6 +2011,8 @@ exports[`generation v3 file(./test/result/v3/services/DefaultsService.ts): ./tes
 /* eslint-disable */
 /* prettier-ignore */
 
+
+
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
 import { ModelWithString } from '../models/ModelWithString';
@@ -2067,6 +2071,8 @@ exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./te
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
+
+
 
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
@@ -2143,6 +2149,8 @@ exports[`generation v3 file(./test/result/v3/services/HeaderService.ts): ./test/
 /* eslint-disable */
 /* prettier-ignore */
 
+
+
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
@@ -2182,6 +2190,8 @@ exports[`generation v3 file(./test/result/v3/services/MultipartService.ts): ./te
 /* eslint-disable */
 /* prettier-ignore */
 
+
+
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
@@ -2218,6 +2228,8 @@ exports[`generation v3 file(./test/result/v3/services/ParametersService.ts): ./t
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
+
+
 
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
@@ -2390,6 +2402,8 @@ exports[`generation v3 file(./test/result/v3/services/ResponseService.ts): ./tes
 /* eslint-disable */
 /* prettier-ignore */
 
+
+
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
 import { ModelWithString } from '../models/ModelWithString';
@@ -2473,6 +2487,8 @@ exports[`generation v3 file(./test/result/v3/services/SimpleService.ts): ./test/
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
+
+
 
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
@@ -2594,6 +2610,8 @@ exports[`generation v3 file(./test/result/v3/services/TypesService.ts): ./test/r
 /* eslint-disable */
 /* prettier-ignore */
 
+
+
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
@@ -2662,6 +2680,8 @@ exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
+
+
 
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
