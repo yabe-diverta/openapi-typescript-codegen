@@ -1910,8 +1910,6 @@ exports[`generation v3 file(./test/result/v3/services/ComplexService.ts): ./test
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
 import { ModelWithArray } from '../models/ModelWithArray';
@@ -1923,86 +1921,85 @@ import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class ComplexService {
-
     /**
      * @param parameterObject Parameter containing object
      * @param parameterReference Parameter containing reference
      * @result ModelWithString Successful response
      * @throws ApiError
      */
-    public static async complexTypes({
-        parameterObject,
-        parameterReference,
-    }: {
-        parameterObject: {
-            first?: {
-                second?: {
-                    third?: string,
-                },
-            },
-        },
-        parameterReference: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
-    }): Promise<Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>> {
-
+    public static async complexTypes(requestParam: ComplexService.complexTypesRequest): Promise<Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/complex\`,
             query: {
-                'parameterObject': parameterObject,
-                'parameterReference': parameterReference,
+                'parameterObject': requestParam.parameterObject,
+                'parameterReference': requestParam.parameterReference,
             },
         });
-
         if (!result.ok) {
             switch (result.status) {
                 case 400: throw new ApiError(result, \`400 server error\`);
                 case 500: throw new ApiError(result, \`500 server error\`);
             }
         }
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @param id
      * @param requestBody
      * @result ModelWithString Success
      * @throws ApiError
      */
-    public static async complexParams({
-        id,
-        requestBody,
-    }: {
-        id: number,
-        requestBody?: {
-            readonly key: string | null,
-            name: string | null,
-            enabled?: boolean,
-            readonly type: ('Monkey' | 'Horse' | 'Bird'),
-            listOfModels?: Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> | null,
-            listOfStrings?: Array<string> | null,
-            parameters: ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString,
-            readonly user?: {
-                readonly id?: number,
-                readonly name?: string | null,
-            },
-        },
-    }): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
-
+    public static async complexParams(requestParam: ComplexService.complexParamsRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
         const result = await __request({
             method: 'put',
             path: \`/api/v\${OpenAPI.VERSION}/complex/\${id}\`,
-            body: requestBody,
+            body: requestParam.requestBody,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
-}"
+export namespace ComplexService {
+    export interface complexTypesRequest {
+        {
+            parameterObject,
+            parameterReference,
+        }: {
+            parameterObject: {
+                first?: {
+                    second?: {
+                        third?: string,
+                    },
+                },
+            },
+            parameterReference: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
+        }    };
+        export type complexTypesResponse = Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>;
+        export interface complexParamsRequest {
+            {
+                id,
+                requestBody,
+            }: {
+                id: number,
+                requestBody?: {
+                    readonly key: string | null,
+                    name: string | null,
+                    enabled?: boolean,
+                    readonly type: ('Monkey' | 'Horse' | 'Bird'),
+                    listOfModels?: Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> | null,
+                    listOfStrings?: Array<string> | null,
+                    parameters: ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString,
+                    readonly user?: {
+                        readonly id?: number,
+                        readonly name?: string | null,
+                    },
+                },
+            }    };
+            export type complexParamsResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString;
+        }"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DefaultsService.ts): ./test/result/v3/services/DefaultsService.ts 1`] = `
@@ -2010,8 +2007,6 @@ exports[`generation v3 file(./test/result/v3/services/DefaultsService.ts): ./tes
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
-
-
 
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
@@ -2021,7 +2016,6 @@ import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class DefaultsService {
-
     /**
      * @param parameterString This is a simple string
      * @param parameterNumber This is a simple number
@@ -2030,40 +2024,42 @@ export class DefaultsService {
      * @param parameterModel This is a simple model
      * @throws ApiError
      */
-    public static async callWithDefaultParameters({
-        parameterString = 'Hello World!',
-        parameterNumber = 123,
-        parameterBoolean = true,
-        parameterEnum = 'Success',
-        parameterModel = {
-            \\"prop\\": \\"Hello World\\"
-        },
-    }: {
-        parameterString: string | null,
-        parameterNumber: number | null,
-        parameterBoolean: boolean | null,
-        parameterEnum: ('Success' | 'Warning' | 'Error'),
-        parameterModel: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
-    }): Promise<void> {
-
+    public static async callWithDefaultParameters(requestParam: DefaultsService.callWithDefaultParametersRequest): Promise<void> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/defaults\`,
             query: {
-                'parameterString': parameterString,
-                'parameterNumber': parameterNumber,
-                'parameterBoolean': parameterBoolean,
-                'parameterEnum': parameterEnum,
-                'parameterModel': parameterModel,
+                'parameterString': requestParam.parameterString,
+                'parameterNumber': requestParam.parameterNumber,
+                'parameterBoolean': requestParam.parameterBoolean,
+                'parameterEnum': requestParam.parameterEnum,
+                'parameterModel': requestParam.parameterModel,
             },
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
-}"
+export namespace DefaultsService {
+    export interface callWithDefaultParametersRequest {
+        {
+            parameterString = 'Hello World!',
+            parameterNumber = 123,
+            parameterBoolean = true,
+            parameterEnum = 'Success',
+            parameterModel = {
+                \\"prop\\": \\"Hello World\\"
+            },
+        }: {
+            parameterString: string | null,
+            parameterNumber: number | null,
+            parameterBoolean: boolean | null,
+            parameterEnum: ('Success' | 'Warning' | 'Error'),
+            parameterModel: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
+        }    };
+        export type callWithDefaultParametersResponse = void;
+    }"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./test/result/v3/services/DuplicateService.ts 1`] = `
@@ -2072,74 +2068,70 @@ exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./te
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class DuplicateService {
-
     /**
      * @throws ApiError
      */
-    public static async duplicateName(): Promise<void> {
-
+    public static async duplicateName(requestParam: DuplicateService.duplicateNameRequest): Promise<void> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async duplicateName1(): Promise<void> {
-
+    public static async duplicateName1(requestParam: DuplicateService.duplicateName1Request): Promise<void> {
         const result = await __request({
             method: 'post',
             path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async duplicateName2(): Promise<void> {
-
+    public static async duplicateName2(requestParam: DuplicateService.duplicateName2Request): Promise<void> {
         const result = await __request({
             method: 'put',
             path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async duplicateName3(): Promise<void> {
-
+    public static async duplicateName3(requestParam: DuplicateService.duplicateName3Request): Promise<void> {
         const result = await __request({
             method: 'delete',
             path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
+export namespace DuplicateService {
+    export interface duplicateNameRequest {
+    };
+    export type duplicateNameResponse = void;
+    export interface duplicateName1Request {
+    };
+    export type duplicateName1Response = void;
+    export interface duplicateName2Request {
+    };
+    export type duplicateName2Response = void;
+    export interface duplicateName3Request {
+    };
+    export type duplicateName3Response = void;
 }"
 `;
 
@@ -2149,38 +2141,36 @@ exports[`generation v3 file(./test/result/v3/services/HeaderService.ts): ./test/
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class HeaderService {
-
     /**
      * @result string Successful response
      * @throws ApiError
      */
-    public static async callWithResultFromHeader(): Promise<string> {
-
+    public static async callWithResultFromHeader(requestParam: HeaderService.callWithResultFromHeaderRequest): Promise<string> {
         const result = await __request({
             method: 'post',
             path: \`/api/v\${OpenAPI.VERSION}/header\`,
             responseHeader: 'operation-location',
         });
-
         if (!result.ok) {
             switch (result.status) {
                 case 400: throw new ApiError(result, \`400 server error\`);
                 case 500: throw new ApiError(result, \`500 server error\`);
             }
         }
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
+export namespace HeaderService {
+    export interface callWithResultFromHeaderRequest {
+    };
+    export type callWithResultFromHeaderResponse = string;
 }"
 `;
 
@@ -2190,36 +2180,41 @@ exports[`generation v3 file(./test/result/v3/services/MultipartService.ts): ./te
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class MultipartService {
-
     /**
      * @result any OK
      * @throws ApiError
      */
-    public static async multipartResponse(): Promise<{
+    public static async multipartResponse(requestParam: MultipartService.multipartResponseRequest): Promise<{
         file?: string,
         metadata?: {
             foo?: string,
             bar?: string,
         },
     }> {
-
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/multipart\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
+export namespace MultipartService {
+    export interface multipartResponseRequest {
+    };
+    export type multipartResponseResponse = {
+        file?: string,
+        metadata?: {
+            foo?: string,
+            bar?: string,
+        },
+    };
 }"
 `;
 
@@ -2229,8 +2224,6 @@ exports[`generation v3 file(./test/result/v3/services/ParametersService.ts): ./t
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
 import { ModelWithString } from '../models/ModelWithString';
@@ -2239,7 +2232,6 @@ import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class ParametersService {
-
     /**
      * @param parameterHeader This is the parameter that goes into the request header
      * @param parameterQuery This is the parameter that goes into the request query params
@@ -2248,43 +2240,27 @@ export class ParametersService {
      * @param requestBody This is the parameter that goes into the body
      * @throws ApiError
      */
-    public static async callWithParameters({
-        parameterHeader,
-        parameterQuery,
-        parameterForm,
-        parameterCookie,
-        requestBody,
-    }: {
-        parameterHeader: string | null,
-        parameterQuery: string | null,
-        parameterForm: string | null,
-        parameterCookie: string | null,
-        requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
-    }): Promise<void> {
-
+    public static async callWithParameters(requestParam: ParametersService.callWithParametersRequest): Promise<void> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/parameters\`,
             cookies: {
-                'parameterCookie': parameterCookie,
+                'parameterCookie': requestParam.parameterCookie,
             },
             headers: {
-                'parameterHeader': parameterHeader,
+                'parameterHeader': requestParam.parameterHeader,
             },
             query: {
-                'parameterQuery': parameterQuery,
+                'parameterQuery': requestParam.parameterQuery,
             },
             formData: {
-                'parameterForm': parameterForm,
+                'parameterForm': requestParam.parameterForm,
             },
-            body: requestBody,
+            body: requestParam.requestBody,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @param parameterHeader This is the parameter that goes into the request header
      * @param parameterQuery This is the parameter that goes into the request query params
@@ -2296,104 +2272,119 @@ export class ParametersService {
      * @param parameterPath3 This is the parameter that goes into the path
      * @throws ApiError
      */
-    public static async callWithWeirdParameterNames({
-        parameterHeader,
-        parameterQuery,
-        parameterForm,
-        parameterCookie,
-        requestBody,
-        parameterPath1,
-        parameterPath2,
-        parameterPath3,
-    }: {
-        parameterHeader: string | null,
-        parameterQuery: string | null,
-        parameterForm: string | null,
-        parameterCookie: string | null,
-        requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
-        parameterPath1?: string,
-        parameterPath2?: string,
-        parameterPath3?: string,
-    }): Promise<void> {
-
+    public static async callWithWeirdParameterNames(requestParam: ParametersService.callWithWeirdParameterNamesRequest): Promise<void> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/parameters/\${parameterPath1}/\${parameterPath2}/\${parameterPath3}\`,
             cookies: {
-                'PARAMETER-COOKIE': parameterCookie,
+                'PARAMETER-COOKIE': requestParam.parameterCookie,
             },
             headers: {
-                'parameter.header': parameterHeader,
+                'parameter.header': requestParam.parameterHeader,
             },
             query: {
-                'parameter-query': parameterQuery,
+                'parameter-query': requestParam.parameterQuery,
             },
             formData: {
-                'parameter_form': parameterForm,
+                'parameter_form': requestParam.parameterForm,
             },
-            body: requestBody,
+            body: requestParam.requestBody,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @param requestBody This is a required parameter
      * @param parameter This is an optional parameter
      * @throws ApiError
      */
-    public static async getCallWithOptionalParam({
-        requestBody,
-        parameter,
-    }: {
-        requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
-        parameter?: string,
-    }): Promise<void> {
-
+    public static async getCallWithOptionalParam(requestParam: ParametersService.getCallWithOptionalParamRequest): Promise<void> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/parameters/\`,
             query: {
-                'parameter': parameter,
+                'parameter': requestParam.parameter,
             },
-            body: requestBody,
+            body: requestParam.requestBody,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @param parameter This is a required parameter
      * @param requestBody This is an optional parameter
      * @throws ApiError
      */
-    public static async postCallWithOptionalParam({
-        parameter,
-        requestBody,
-    }: {
-        parameter: string,
-        requestBody?: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
-    }): Promise<void> {
-
+    public static async postCallWithOptionalParam(requestParam: ParametersService.postCallWithOptionalParamRequest): Promise<void> {
         const result = await __request({
             method: 'post',
             path: \`/api/v\${OpenAPI.VERSION}/parameters/\`,
             query: {
-                'parameter': parameter,
+                'parameter': requestParam.parameter,
             },
-            body: requestBody,
+            body: requestParam.requestBody,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
-}"
+export namespace ParametersService {
+    export interface callWithParametersRequest {
+        {
+            parameterHeader,
+            parameterQuery,
+            parameterForm,
+            parameterCookie,
+            requestBody,
+        }: {
+            parameterHeader: string | null,
+            parameterQuery: string | null,
+            parameterForm: string | null,
+            parameterCookie: string | null,
+            requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
+        }    };
+        export type callWithParametersResponse = void;
+        export interface callWithWeirdParameterNamesRequest {
+            {
+                parameterHeader,
+                parameterQuery,
+                parameterForm,
+                parameterCookie,
+                requestBody,
+                parameterPath1,
+                parameterPath2,
+                parameterPath3,
+            }: {
+                parameterHeader: string | null,
+                parameterQuery: string | null,
+                parameterForm: string | null,
+                parameterCookie: string | null,
+                requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
+                parameterPath1?: string,
+                parameterPath2?: string,
+                parameterPath3?: string,
+            }    };
+            export type callWithWeirdParameterNamesResponse = void;
+            export interface getCallWithOptionalParamRequest {
+                {
+                    requestBody,
+                    parameter,
+                }: {
+                    requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
+                    parameter?: string,
+                }    };
+                export type getCallWithOptionalParamResponse = void;
+                export interface postCallWithOptionalParamRequest {
+                    {
+                        parameter,
+                        requestBody,
+                    }: {
+                        parameter: string,
+                        requestBody?: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
+                    }    };
+                    export type postCallWithOptionalParamResponse = void;
+                }"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/ResponseService.ts): ./test/result/v3/services/ResponseService.ts 1`] = `
@@ -2401,8 +2392,6 @@ exports[`generation v3 file(./test/result/v3/services/ResponseService.ts): ./tes
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
-
-
 
 import { ModelThatExtends } from '../models/ModelThatExtends';
 import { ModelThatExtendsExtends } from '../models/ModelThatExtendsExtends';
@@ -2412,34 +2401,27 @@ import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class ResponseService {
-
     /**
      * @result ModelWithString
      * @throws ApiError
      */
-    public static async callWithResponse(): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
-
+    public static async callWithResponse(requestParam: ResponseService.callWithResponseRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/response\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @result ModelWithString Message for default response
      * @throws ApiError
      */
-    public static async callWithDuplicateResponses(): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
-
+    public static async callWithDuplicateResponses(requestParam: ResponseService.callWithDuplicateResponsesRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
         const result = await __request({
             method: 'post',
             path: \`/api/v\${OpenAPI.VERSION}/response\`,
         });
-
         if (!result.ok) {
             switch (result.status) {
                 case 500: throw new ApiError(result, \`Message for 500 error\`);
@@ -2447,25 +2429,20 @@ export class ResponseService {
                 case 502: throw new ApiError(result, \`Message for 502 error\`);
             }
         }
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @result ModelWithString Message for default response
      * @result ModelThatExtends Message for 201 response
      * @result ModelThatExtendsExtends Message for 202 response
      * @throws ApiError
      */
-    public static async callWithResponses(): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString | ModelThatExtends | ModelThatExtendsExtends | ModelThatExtendsExtends> {
-
+    public static async callWithResponses(requestParam: ResponseService.callWithResponsesRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString | ModelThatExtends | ModelThatExtendsExtends | ModelThatExtendsExtends> {
         const result = await __request({
             method: 'put',
             path: \`/api/v\${OpenAPI.VERSION}/response\`,
         });
-
         if (!result.ok) {
             switch (result.status) {
                 case 500: throw new ApiError(result, \`Message for 500 error\`);
@@ -2473,12 +2450,21 @@ export class ResponseService {
                 case 502: throw new ApiError(result, \`Message for 502 error\`);
             }
         }
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
+export namespace ResponseService {
+    export interface callWithResponseRequest {
+    };
+    export type callWithResponseResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString;
+    export interface callWithDuplicateResponsesRequest {
+    };
+    export type callWithDuplicateResponsesResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString;
+    export interface callWithResponsesRequest {
+    };
+    export type callWithResponsesResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString | ModelThatExtends | ModelThatExtendsExtends | ModelThatExtendsExtends;
 }"
 `;
 
@@ -2488,119 +2474,112 @@ exports[`generation v3 file(./test/result/v3/services/SimpleService.ts): ./test/
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class SimpleService {
-
     /**
      * @throws ApiError
      */
-    public static async getCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async getCallWithoutParametersAndResponse(requestParam: SimpleService.getCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async putCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async putCallWithoutParametersAndResponse(requestParam: SimpleService.putCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'put',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async postCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async postCallWithoutParametersAndResponse(requestParam: SimpleService.postCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'post',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async deleteCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async deleteCallWithoutParametersAndResponse(requestParam: SimpleService.deleteCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'delete',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async optionsCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async optionsCallWithoutParametersAndResponse(requestParam: SimpleService.optionsCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'options',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async headCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async headCallWithoutParametersAndResponse(requestParam: SimpleService.headCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'head',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
-
     /**
      * @throws ApiError
      */
-    public static async patchCallWithoutParametersAndResponse(): Promise<void> {
-
+    public static async patchCallWithoutParametersAndResponse(requestParam: SimpleService.patchCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'patch',
             path: \`/api/v\${OpenAPI.VERSION}/simple\`,
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
+export namespace SimpleService {
+    export interface getCallWithoutParametersAndResponseRequest {
+    };
+    export type getCallWithoutParametersAndResponseResponse = void;
+    export interface putCallWithoutParametersAndResponseRequest {
+    };
+    export type putCallWithoutParametersAndResponseResponse = void;
+    export interface postCallWithoutParametersAndResponseRequest {
+    };
+    export type postCallWithoutParametersAndResponseResponse = void;
+    export interface deleteCallWithoutParametersAndResponseRequest {
+    };
+    export type deleteCallWithoutParametersAndResponseResponse = void;
+    export interface optionsCallWithoutParametersAndResponseRequest {
+    };
+    export type optionsCallWithoutParametersAndResponseResponse = void;
+    export interface headCallWithoutParametersAndResponseRequest {
+    };
+    export type headCallWithoutParametersAndResponseResponse = void;
+    export interface patchCallWithoutParametersAndResponseRequest {
+    };
+    export type patchCallWithoutParametersAndResponseResponse = void;
 }"
 `;
 
@@ -2610,14 +2589,11 @@ exports[`generation v3 file(./test/result/v3/services/TypesService.ts): ./test/r
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class TypesService {
-
     /**
      * @param parameterNumber This is a number parameter
      * @param parameterString This is a string parameter
@@ -2633,46 +2609,48 @@ export class TypesService {
      * @result any Response is a simple object
      * @throws ApiError
      */
-    public static async types({
-        parameterNumber = 123,
-        parameterString = 'default',
-        parameterBoolean = true,
-        parameterObject = null,
-        parameterArray,
-        parameterDictionary,
-        parameterEnum,
-        id,
-    }: {
-        parameterNumber: number,
-        parameterString: string | null,
-        parameterBoolean: boolean | null,
-        parameterObject: any,
-        parameterArray: Array<string> | null,
-        parameterDictionary: any,
-        parameterEnum: ('Success' | 'Warning' | 'Error') | null,
-        id?: number,
-    }): Promise<number | string | boolean | any> {
-
+    public static async types(requestParam: TypesService.typesRequest): Promise<number | string | boolean | any> {
         const result = await __request({
             method: 'get',
             path: \`/api/v\${OpenAPI.VERSION}/types\`,
             query: {
-                'parameterNumber': parameterNumber,
-                'parameterString': parameterString,
-                'parameterBoolean': parameterBoolean,
-                'parameterObject': parameterObject,
-                'parameterArray': parameterArray,
-                'parameterDictionary': parameterDictionary,
-                'parameterEnum': parameterEnum,
+                'parameterNumber': requestParam.parameterNumber,
+                'parameterString': requestParam.parameterString,
+                'parameterBoolean': requestParam.parameterBoolean,
+                'parameterObject': requestParam.parameterObject,
+                'parameterArray': requestParam.parameterArray,
+                'parameterDictionary': requestParam.parameterDictionary,
+                'parameterEnum': requestParam.parameterEnum,
             },
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
-}"
+export namespace TypesService {
+    export interface typesRequest {
+        {
+            parameterNumber = 123,
+            parameterString = 'default',
+            parameterBoolean = true,
+            parameterObject = null,
+            parameterArray,
+            parameterDictionary,
+            parameterEnum,
+            id,
+        }: {
+            parameterNumber: number,
+            parameterString: string | null,
+            parameterBoolean: boolean | null,
+            parameterObject: any,
+            parameterArray: Array<string> | null,
+            parameterDictionary: any,
+            parameterEnum: ('Success' | 'Warning' | 'Error') | null,
+            id?: number,
+        }    };
+        export type typesResponse = number | string | boolean | any;
+    }"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/result/v3/services/UploadService.ts 1`] = `
@@ -2681,37 +2659,36 @@ exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/
 /* eslint-disable */
 /* prettier-ignore */
 
-
-
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class UploadService {
-
     /**
      * @param file Supply a file reference for upload
      * @result boolean
      * @throws ApiError
      */
-    public static async uploadFile({
-        file,
-    }: {
-        file: File,
-    }): Promise<boolean> {
-
+    public static async uploadFile(requestParam: UploadService.uploadFileRequest): Promise<boolean> {
         const result = await __request({
             method: 'post',
             path: \`/api/v\${OpenAPI.VERSION}/upload\`,
             formData: {
-                'file': file,
+                'file': requestParam.file,
             },
         });
-
         catchGenericError(result);
-
         return result.body;
     }
+}
 
-}"
+export namespace UploadService {
+    export interface uploadFileRequest {
+        {
+            file,
+        }: {
+            file: File,
+        }    };
+        export type uploadFileResponse = boolean;
+    }"
 `;

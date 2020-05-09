@@ -4,92 +4,97 @@
 /* prettier-ignore */
 
 {{#if imports}}
-{{#each imports}}
-import { {{{this}}} } from '../models/{{{this}}}';
-{{/each}}
+    {{#each imports}}
+        import { {{{this}}} } from '../models/{{{this}}}';
+    {{/each}}
 {{/if}}
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
 
 export class {{{name}}} {
-
-    {{#each operations}}
+{{#each operations}}
     /**
     {{#if deprecated}}
-     * @deprecated
+        * @deprecated
     {{/if}}
     {{#if summary}}
-     * {{{summary}}}
+        * {{{summary}}}
     {{/if}}
     {{#if description}}
-     * {{{description}}}
+        * {{{description}}}
     {{/if}}
     {{#if parameters}}
-    {{#each parameters}}
-     * @param {{{name}}} {{{description}}}
-    {{/each}}
+        {{#each parameters}}
+            * @param {{{name}}} {{{description}}}
+        {{/each}}
     {{/if}}
     {{#each results}}
-     * @result {{{type}}} {{{description}}}
+        * @result {{{type}}} {{{description}}}
     {{/each}}
-     * @throws ApiError
-     */
-    public static async {{{name}}}({{>parameters}}): Promise<{{>result}}> {
-
+    * @throws ApiError
+    */
+    public static async {{{name}}}(requestParam: {{../name}}.{{name}}Request): Promise<{{>result}}> {
         const result = await __request({
-            method: '{{{method}}}',
-            path: `{{{path}}}`,
-            {{#if parametersCookie~}}
+        method: '{{{method}}}',
+        path: `{{{path}}}`,
+        {{#if parametersCookie~}}
             cookies: {
-                {{#each parametersCookie}}
-                '{{{prop}}}': {{{name}}},
-                {{/each}}
+            {{#each parametersCookie}}
+                '{{{prop}}}': requestParam.{{{name}}},
+            {{/each}}
             },
-            {{/if}}
-            {{#if parametersHeader~}}
+        {{/if}}
+        {{#if parametersHeader~}}
             headers: {
-                {{#each parametersHeader}}
-                '{{{prop}}}': {{{name}}},
-                {{/each}}
+            {{#each parametersHeader}}
+                '{{{prop}}}': requestParam.{{{name}}},
+            {{/each}}
             },
-            {{/if}}
-            {{#if parametersQuery~}}
+        {{/if}}
+        {{#if parametersQuery~}}
             query: {
-                {{#each parametersQuery}}
-                '{{{prop}}}': {{{name}}},
-                {{/each}}
+            {{#each parametersQuery}}
+                '{{{prop}}}': requestParam.{{{name}}},
+            {{/each}}
             },
-            {{/if}}
-            {{#if parametersForm~}}
+        {{/if}}
+        {{#if parametersForm~}}
             formData: {
-                {{#each parametersForm}}
-                '{{{prop}}}': {{{name}}},
-                {{/each}}
+            {{#each parametersForm}}
+                '{{{prop}}}': requestParam.{{{name}}},
+            {{/each}}
             },
-            {{/if}}
-            {{#if parametersBody~}}
-            body: {{{parametersBody.name}}},
-            {{/if}}
-            {{#if responseHeader~}}
+        {{/if}}
+        {{#if parametersBody~}}
+            body: requestParam.{{{parametersBody.name}}},
+        {{/if}}
+        {{#if responseHeader~}}
             responseHeader: '{{{responseHeader}}}',
-            {{/if}}
+        {{/if}}
         });
         {{#if errors}}
-
-        if (!result.ok) {
+            if (!result.ok) {
             switch (result.status) {
             {{#each errors}}
                 case {{{code}}}: throw new ApiError(result, `{{{description}}}`);
             {{/each}}
             }
-        }
+            }
         {{/if}}
-
         catchGenericError(result);
-
         return result.body;
-    }
+        }
+{{/each}}
+}
 
+export namespace {{{name}}} {
+{{#each operations}}
+    export interface {{{name}}}Request {
+    {{#each parameters}}
     {{/each}}
+    {{>parameters}}
+    };
+    export type {{{name}}}Response = {{>result}};
+{{/each}}
 }
