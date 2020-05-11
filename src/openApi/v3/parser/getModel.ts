@@ -121,7 +121,6 @@ export function getModel(openApi: OpenApi, definition: OpenApiSchema, isDefiniti
                 return d.anyOf ? ((d.anyOf.map(a => getModel(openApi, a)).flat() as Model[]).flat() as Model[]) : [getModel(openApi, d)];
             })
             .flat();
-        console.log(compositionItems);
         const composition = compositionItems
             .map(t => {
                 if (t.enum.length > 0) {
@@ -159,7 +158,6 @@ export function getModel(openApi: OpenApi, definition: OpenApiSchema, isDefiniti
                 return d.oneOf ? ((d.oneOf.map(a => getModel(openApi, a)).flat() as Model[]).flat() as Model[]) : [getModel(openApi, d)];
             })
             .flat();
-        console.log(compositionItems);
         const composition = compositionItems
             .map(t => {
                 if (t.enum.length > 0) {
