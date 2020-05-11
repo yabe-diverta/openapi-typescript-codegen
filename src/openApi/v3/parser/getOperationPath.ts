@@ -10,7 +10,7 @@ import { getOperationParameterName } from './getOperationParameterName';
 export function getOperationPath(path: string): string {
     return path
         .replace(/\{(.*?)\}/g, (_, w: string) => {
-            return `\${${getOperationParameterName(w)}}`;
+            return `\${requestParam.${getOperationParameterName(w)}}`;
         })
         .replace('${apiVersion}', '${OpenAPI.VERSION}');
 }
