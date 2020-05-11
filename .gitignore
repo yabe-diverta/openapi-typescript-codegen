@@ -14,3 +14,5 @@ coverage
 test/result
 
 generated
+
+test*.json
