@@ -68,15 +68,18 @@ exports[`generation v3 file(./test/result/v3/core/OpenAPI.ts): ./test/result/v3/
 /* prettier-ignore */
 
 interface Config {
-BASE: string;
-VERSION: string;
-TOKEN: string;
+    BASE: string;
+    VERSION: string;
+    TOKEN: string;
+    SECURITY: { [definedName: string]: object };
 }
 
 export const OpenAPI: Config = {
-BASE: '/api',
-VERSION: '1',
-TOKEN: '',
+    BASE: '/api',
+    VERSION: '1',
+    TOKEN: '',
+    SECURITY: {
+    }
 };"
 `;
 
@@ -229,9 +232,15 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
         credentials: 'same-origin',
     };
 
-    // If we have a bearer token then we set the authentication header.
+    // Add Token to request header for RCMS's auth (it's particular for RCMS).
     if (OpenAPI.TOKEN !== null && OpenAPI.TOKEN !== '') {
-        headers.append('Authorization', \`Bearer \${OpenAPI.TOKEN}\`);
+
+        // @TODO: fix to retrieve type.
+        Object.values(OpenAPI.SECURITY).forEach((security: any) => {
+            if (security.in === 'header') {
+                headers.append(security.name, \`\${OpenAPI.TOKEN}\`);
+            }
+        })
     }
 
     // Add the query parameters (if defined).
@@ -771,8 +780,6 @@ exports[`generation v3 file(./test/result/v3/models/ModelWithAnyOf.ts): ./test/r
 /* eslint-disable */
 /* prettier-ignore */
 
-import { ModelThatExtends } from './ModelThatExtends';
-import { ModelThatExtendsExtends } from './ModelThatExtendsExtends';
 import { ModelWithArray } from './ModelWithArray';
 import { ModelWithDictionary } from './ModelWithDictionary';
 import { ModelWithEnum } from './ModelWithEnum';
@@ -782,7 +789,7 @@ import { ModelWithString } from './ModelWithString';
  * This is a model with one property with a 'any of' relationship
  */
 export interface ModelWithAnyOf {
-    propA?: ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString;
+    propA?:  |  |  | ;
 }
 "
 `;
@@ -1049,8 +1056,6 @@ exports[`generation v3 file(./test/result/v3/models/ModelWithOneOf.ts): ./test/r
 /* eslint-disable */
 /* prettier-ignore */
 
-import { ModelThatExtends } from './ModelThatExtends';
-import { ModelThatExtendsExtends } from './ModelThatExtendsExtends';
 import { ModelWithArray } from './ModelWithArray';
 import { ModelWithDictionary } from './ModelWithDictionary';
 import { ModelWithEnum } from './ModelWithEnum';
@@ -1060,7 +1065,7 @@ import { ModelWithString } from './ModelWithString';
  * This is a model with one property with a 'one of' relationship
  */
 export interface ModelWithOneOf {
-    propA?: ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString;
+    propA?:  |  |  | ;
 }
 "
 `;
@@ -1478,7 +1483,7 @@ exports[`generation v3 file(./test/result/v3/schemas/$ModelWithAnyOf.ts): ./test
 export const $ModelWithAnyOf = {
     properties: {
         propA: {
-            type: 'ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString',
+            type: ' |  |  | ',
         },
     },
 };"
@@ -1711,7 +1716,7 @@ exports[`generation v3 file(./test/result/v3/schemas/$ModelWithOneOf.ts): ./test
 export const $ModelWithOneOf = {
     properties: {
         propA: {
-            type: 'ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString',
+            type: ' |  |  | ',
         },
     },
 };"
@@ -1930,7 +1935,7 @@ export class ComplexService {
     public static async complexTypes(requestParam: ComplexService.complexTypesRequest): Promise<Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/complex\`,
+            path: \`/api/v\${requestParam.apiVersion}/complex\`,
             query: {
                 'parameterObject': requestParam.parameterObject,
                 'parameterReference': requestParam.parameterReference,
@@ -1954,7 +1959,7 @@ export class ComplexService {
     public static async complexParams(requestParam: ComplexService.complexParamsRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
         const result = await __request({
             method: 'put',
-            path: \`/api/v\${OpenAPI.VERSION}/complex/\${id}\`,
+            path: \`/api/v\${requestParam.apiVersion}/complex/\${requestParam.id}\`,
             body: requestParam.requestBody,
         });
         catchGenericError(result);
@@ -1991,7 +1996,7 @@ export namespace ComplexService {
                     readonly type: ('Monkey' | 'Horse' | 'Bird'),
                     listOfModels?: Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> | null,
                     listOfStrings?: Array<string> | null,
-                    parameters: ModelThatExtends | ModelThatExtendsExtends | ModelWithArray | ModelWithDictionary | ModelWithEnum | ModelWithString,
+                    parameters:  |  |  | ,
                     readonly user?: {
                         readonly id?: number,
                         readonly name?: string | null,
@@ -2027,7 +2032,7 @@ export class DefaultsService {
     public static async callWithDefaultParameters(requestParam: DefaultsService.callWithDefaultParametersRequest): Promise<void> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/defaults\`,
+            path: \`/api/v\${requestParam.apiVersion}/defaults\`,
             query: {
                 'parameterString': requestParam.parameterString,
                 'parameterNumber': requestParam.parameterNumber,
@@ -2079,7 +2084,7 @@ export class DuplicateService {
     public static async duplicateName(requestParam: DuplicateService.duplicateNameRequest): Promise<void> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
+            path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2090,7 +2095,7 @@ export class DuplicateService {
     public static async duplicateName1(requestParam: DuplicateService.duplicateName1Request): Promise<void> {
         const result = await __request({
             method: 'post',
-            path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
+            path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2101,7 +2106,7 @@ export class DuplicateService {
     public static async duplicateName2(requestParam: DuplicateService.duplicateName2Request): Promise<void> {
         const result = await __request({
             method: 'put',
-            path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
+            path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2112,7 +2117,7 @@ export class DuplicateService {
     public static async duplicateName3(requestParam: DuplicateService.duplicateName3Request): Promise<void> {
         const result = await __request({
             method: 'delete',
-            path: \`/api/v\${OpenAPI.VERSION}/duplicate\`,
+            path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2153,7 +2158,7 @@ export class HeaderService {
     public static async callWithResultFromHeader(requestParam: HeaderService.callWithResultFromHeaderRequest): Promise<string> {
         const result = await __request({
             method: 'post',
-            path: \`/api/v\${OpenAPI.VERSION}/header\`,
+            path: \`/api/v\${requestParam.apiVersion}/header\`,
             responseHeader: 'operation-location',
         });
         if (!result.ok) {
@@ -2198,7 +2203,7 @@ export class MultipartService {
     }> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/multipart\`,
+            path: \`/api/v\${requestParam.apiVersion}/multipart\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2243,7 +2248,7 @@ export class ParametersService {
     public static async callWithParameters(requestParam: ParametersService.callWithParametersRequest): Promise<void> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/parameters\`,
+            path: \`/api/v\${requestParam.apiVersion}/parameters\`,
             cookies: {
                 'parameterCookie': requestParam.parameterCookie,
             },
@@ -2275,7 +2280,7 @@ export class ParametersService {
     public static async callWithWeirdParameterNames(requestParam: ParametersService.callWithWeirdParameterNamesRequest): Promise<void> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/parameters/\${parameterPath1}/\${parameterPath2}/\${parameterPath3}\`,
+            path: \`/api/v\${requestParam.apiVersion}/parameters/\${requestParam.parameterPath1}/\${requestParam.parameterPath2}/\${requestParam.parameterPath3}\`,
             cookies: {
                 'PARAMETER-COOKIE': requestParam.parameterCookie,
             },
@@ -2301,7 +2306,7 @@ export class ParametersService {
     public static async getCallWithOptionalParam(requestParam: ParametersService.getCallWithOptionalParamRequest): Promise<void> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/parameters/\`,
+            path: \`/api/v\${requestParam.apiVersion}/parameters/\`,
             query: {
                 'parameter': requestParam.parameter,
             },
@@ -2318,7 +2323,7 @@ export class ParametersService {
     public static async postCallWithOptionalParam(requestParam: ParametersService.postCallWithOptionalParamRequest): Promise<void> {
         const result = await __request({
             method: 'post',
-            path: \`/api/v\${OpenAPI.VERSION}/parameters/\`,
+            path: \`/api/v\${requestParam.apiVersion}/parameters/\`,
             query: {
                 'parameter': requestParam.parameter,
             },
@@ -2408,7 +2413,7 @@ export class ResponseService {
     public static async callWithResponse(requestParam: ResponseService.callWithResponseRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/response\`,
+            path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2420,7 +2425,7 @@ export class ResponseService {
     public static async callWithDuplicateResponses(requestParam: ResponseService.callWithDuplicateResponsesRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
         const result = await __request({
             method: 'post',
-            path: \`/api/v\${OpenAPI.VERSION}/response\`,
+            path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
         if (!result.ok) {
             switch (result.status) {
@@ -2441,7 +2446,7 @@ export class ResponseService {
     public static async callWithResponses(requestParam: ResponseService.callWithResponsesRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString | ModelThatExtends | ModelThatExtendsExtends | ModelThatExtendsExtends> {
         const result = await __request({
             method: 'put',
-            path: \`/api/v\${OpenAPI.VERSION}/response\`,
+            path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
         if (!result.ok) {
             switch (result.status) {
@@ -2485,7 +2490,7 @@ export class SimpleService {
     public static async getCallWithoutParametersAndResponse(requestParam: SimpleService.getCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2496,7 +2501,7 @@ export class SimpleService {
     public static async putCallWithoutParametersAndResponse(requestParam: SimpleService.putCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'put',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2507,7 +2512,7 @@ export class SimpleService {
     public static async postCallWithoutParametersAndResponse(requestParam: SimpleService.postCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'post',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2518,7 +2523,7 @@ export class SimpleService {
     public static async deleteCallWithoutParametersAndResponse(requestParam: SimpleService.deleteCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'delete',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2529,7 +2534,7 @@ export class SimpleService {
     public static async optionsCallWithoutParametersAndResponse(requestParam: SimpleService.optionsCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'options',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2540,7 +2545,7 @@ export class SimpleService {
     public static async headCallWithoutParametersAndResponse(requestParam: SimpleService.headCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'head',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2551,7 +2556,7 @@ export class SimpleService {
     public static async patchCallWithoutParametersAndResponse(requestParam: SimpleService.patchCallWithoutParametersAndResponseRequest): Promise<void> {
         const result = await __request({
             method: 'patch',
-            path: \`/api/v\${OpenAPI.VERSION}/simple\`,
+            path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
         catchGenericError(result);
         return result.body;
@@ -2612,7 +2617,7 @@ export class TypesService {
     public static async types(requestParam: TypesService.typesRequest): Promise<number | string | boolean | any> {
         const result = await __request({
             method: 'get',
-            path: \`/api/v\${OpenAPI.VERSION}/types\`,
+            path: \`/api/v\${requestParam.apiVersion}/types\`,
             query: {
                 'parameterNumber': requestParam.parameterNumber,
                 'parameterString': requestParam.parameterString,
@@ -2672,7 +2677,7 @@ export class UploadService {
     public static async uploadFile(requestParam: UploadService.uploadFileRequest): Promise<boolean> {
         const result = await __request({
             method: 'post',
-            path: \`/api/v\${OpenAPI.VERSION}/upload\`,
+            path: \`/api/v\${requestParam.apiVersion}/upload\`,
             formData: {
                 'file': requestParam.file,
             },

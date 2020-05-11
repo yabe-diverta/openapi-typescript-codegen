@@ -34,9 +34,15 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
         credentials: 'same-origin',
     };
 
-    // If we have a bearer token then we set the authentication header.
+    // Add Token to request header for RCMS's auth (it's particular for RCMS).
     if (OpenAPI.TOKEN !== null && OpenAPI.TOKEN !== '') {
-        headers.append('Authorization', `Bearer ${OpenAPI.TOKEN}`);
+
+        // @TODO: fix to retrieve type.
+        Object.values(OpenAPI.SECURITY).forEach((security: any) => {
+            if (security.in === 'header') {
+                headers.append(security.name, `${OpenAPI.TOKEN}`);
+            }
+        })
     }
 
     // Add the query parameters (if defined).

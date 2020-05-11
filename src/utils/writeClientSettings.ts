@@ -16,6 +16,7 @@ export function writeClientSettings(client: Client, templates: Templates, output
         templates.settings({
             server: client.server,
             version: client.version,
+            security: client.security,
         })
     );
 }

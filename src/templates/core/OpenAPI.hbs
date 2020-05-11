@@ -4,13 +4,23 @@
 /* prettier-ignore */
 
 interface Config {
-BASE: string;
-VERSION: string;
-TOKEN: string;
+    BASE: string;
+    VERSION: string;
+    TOKEN: string;
+    SECURITY: { [definedName: string]: object };
 }
 
 export const OpenAPI: Config = {
-BASE: '{{{server}}}',
-VERSION: '{{{version}}}',
-TOKEN: '',
+    BASE: '{{{server}}}',
+    VERSION: '{{{version}}}',
+    TOKEN: '',
+    SECURITY: {
+    {{#each security}}
+        '{{@key}}': {
+            {{#each this}}
+            '{{@key}}': '{{this}}',
+            {{/each}}
+        },
+    {{/each}}
+    }
 };

@@ -41,6 +41,7 @@ export function getOperation(openApi: OpenApi, url: string, method: string, op: 
         errors: [],
         results: [],
         responseHeader: null,
+        security: op.security,
     };
 
     // Parse the operation parameters (path, query, body, etc).
