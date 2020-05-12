@@ -13,7 +13,6 @@ program
     .option('--useUnionTypes', 'Use inclusive union types', false)
     .option('--exportCore', 'Generate core', true)
     .option('--exportServices', 'Generate services', true)
-    .option('--exportModels', 'Generate models', true)
     .option('--exportSchemas', 'Generate schemas', false)
     .parse(process.argv);
 
@@ -26,7 +25,6 @@ if (OpenAPI) {
         useUnionTypes: program.useUnionTypes,
         exportCore: program.exportCore,
         exportServices: program.exportServices,
-        exportModels: program.exportModels,
         exportSchemas: program.exportSchemas,
     });
 }

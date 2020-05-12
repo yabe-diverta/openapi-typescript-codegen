@@ -22,10 +22,9 @@ function copySupportFile(filePath: string, outputPath: string): void {
  * @param output Directory to write the generated files to.
  * @param exportCore: Generate core.
  * @param exportServices: Generate services.
- * @param exportModels: Generate models.
  * @param exportSchemas: Generate schemas.
  */
-export function writeClient(client: Client, templates: Templates, output: string, exportCore: boolean, exportServices: boolean, exportModels: boolean, exportSchemas: boolean): void {
+export function writeClient(client: Client, templates: Templates, output: string, exportCore: boolean, exportServices: boolean, exportSchemas: boolean): void {
     const outputPath = path.resolve(process.cwd(), output);
     const outputPathCore = path.resolve(outputPath, 'core');
     const outputPathModels = path.resolve(outputPath, 'models');
@@ -62,11 +61,9 @@ export function writeClient(client: Client, templates: Templates, output: string
         writeClientSchemas(client.models, templates, outputPathSchemas);
     }
 
-    if (exportModels) {
-        mkdirp.sync(outputPathModels);
-        copySupportFile('models/Dictionary.ts', outputPath);
-        writeClientModels(client.models, templates, outputPathModels);
-    }
+    mkdirp.sync(outputPathModels);
+    copySupportFile('models/Dictionary.ts', outputPath);
+    writeClientModels(client.models, templates, outputPathModels);
 
-    writeClientIndex(client, templates, outputPath, exportCore, exportModels, exportServices, exportSchemas);
+    writeClientIndex(client, templates, outputPath, exportCore, exportServices, exportSchemas);
 }

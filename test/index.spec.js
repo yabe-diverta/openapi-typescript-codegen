@@ -10,7 +10,6 @@ describe('generation', () => {
             useUnionTypes: true,
             exportCore: true,
             exportSchemas: true,
-            exportModels: true,
             exportServices: true,
         });
 
