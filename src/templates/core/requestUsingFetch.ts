@@ -17,6 +17,7 @@ async function parseBody(response: Response): Promise<any> {
         if (contentType) {
             switch (contentType.toLowerCase()) {
                 case 'application/json':
+                case 'application/json;charset=utf-8':
                 case 'application/json; charset=utf-8':
                     return await response.json();
 

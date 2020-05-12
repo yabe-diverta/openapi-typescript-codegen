@@ -9,6 +9,7 @@ import { OpenAPI } from './OpenAPI';
 import { RequestOptions } from './RequestOptions';
 import { requestUsingFetch } from './requestUsingFetch';
 import { Result } from './Result';
+import { Auth } from './Auth';
 
 /**
  * Create the request.
@@ -38,7 +39,7 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
     // @TODO: fix to retrieve type.
     Object.values(OpenAPI.SECURITY).forEach((security: any) => {
         if (security.in === 'header') {
-            headers.append(security.name, `${OpenAPI.TOKEN}`);
+            headers.append(security.name, `${Auth.getAccessToken()}`);
         }
     })
 
