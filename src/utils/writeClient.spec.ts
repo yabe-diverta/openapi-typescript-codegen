@@ -21,6 +21,7 @@ describe('writeClient', () => {
             version: 'v1',
             models: [],
             services: [],
+            security: {},
         };
 
         const templates: Templates = {
@@ -29,9 +30,10 @@ describe('writeClient', () => {
             schema: () => 'dummy',
             service: () => 'dummy',
             settings: () => 'dummy',
+            apiInfo: () => 'dummy',
         };
 
-        writeClient(client, templates, '/', false, true, true, true, true);
+        writeClient(client, templates, '/', false, true, true, true);
 
         expect(rimrafSync).toBeCalled();
         expect(mkdirpSync).toBeCalled();

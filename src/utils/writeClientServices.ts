@@ -10,14 +10,12 @@ import { Templates } from './readHandlebarsTemplates';
  * @param services Array of Services to write.
  * @param templates The loaded handlebar templates.
  * @param outputPath Directory to write the generated files to.
- * @param useOptions Use options or arguments functions.
  */
-export function writeClientServices(services: Service[], templates: Templates, outputPath: string, useOptions: boolean): void {
+export function writeClientServices(services: Service[], templates: Templates, outputPath: string): void {
     services.forEach(service => {
         const file = path.resolve(outputPath, `${service.name}.ts`);
         const templateResult = templates.service({
             ...service,
-            useOptions,
         });
         fs.writeFileSync(file, format(templateResult));
     });

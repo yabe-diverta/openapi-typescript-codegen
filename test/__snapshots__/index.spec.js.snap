@@ -103,105 +103,100 @@ exports[`generation v3 file(./test/result/v3/core/Auth.ts): ./test/result/v3/cor
 import { SpecialOperationInfo } from './ApiInfo';
 
 export class Auth {
+    public static async login(param: Parameters<typeof SpecialOperationInfo.login.method>[0]) {
+        Auth.deleteAccessToken();
+        Auth.deleteRefreshToken();
 
-  public static async login(param: Parameters<typeof SpecialOperationInfo.login.method>) {
-    Auth.deleteAccessToken();
-    Auth.deleteRefreshToken();
+        if (!SpecialOperationInfo.login) {
+            return Promise.resolve();
+        }
 
-    if (!SpecialOperationInfo.login) {
-        return Promise.resolve();
+        const request = SpecialOperationInfo.login.method(param);
+        const rtn = await request.then(prms => prms.value() as Promise<LoginResponse>);
+        const { grant_token, errors } = rtn;
+
+        if (errors && Array.isArray(errors) && errors.length > 0) {
+            return Promise.reject(errors);
+        }
+
+        return await Auth.createToken({ requestBody: { grant_token } });
     }
 
-    const request = SpecialOperationInfo.login.method(param[0]);
-    const rtn = await request.then(prms => prms.value() as Promise<LoginResponse>);
-    const { grant_token, errors } = rtn;
-
-    if (errors && Array.isArray(errors) && errors.length > 0) {
-        return Promise.reject(errors);
+    public static async loginWithStoredToken(param: Parameters<typeof Auth.createToken>[0]) {
+        const refreshToken = Auth.getRefreshToken();
+        if (refreshToken === '') {
+            await null;
+            return Promise.reject('no refresh token.');
+        }
+        return await Auth.createToken(param);
     }
 
-    return await Auth.createToken({ requestBody: { grant_token } });
-  }
-
-  public static async loginWithStoredToken() {
-    const refreshToken = Auth.getRefreshToken();
-    if (refreshToken === '') {
-      await null;
-      return Promise.reject('no refresh token.');
-    }
-    return await Auth.createToken({ requestBody: { refresh_token } });
-  }
-
-  public static async logout(param: Parameters<typeof SpecialOperationInfo.logout.method>) {
-    if (!SpecialOperationInfo.logout) {
-      return Promise.resolve();
-    }
-    return await SpecialOperationInfo.logout.method(param[0]).finally(() => {
-      Auth.deleteAccessToken();
-      Auth.deleteRefreshToken();
-    });
-  }
-
-  public static async createToken(param: Parameters<typeof SpecialOperationInfo.token.method>) {
-    if (!SpecialOperationInfo.token) {
-      return Promise.resolve();
+    public static async logout(param: Parameters<typeof SpecialOperationInfo.logout.method>[0]) {
+        if (!SpecialOperationInfo.logout) {
+            return Promise.resolve();
+        }
+        return await SpecialOperationInfo.logout.method(param).finally(() => {
+            Auth.deleteAccessToken();
+            Auth.deleteRefreshToken();
+        });
     }
 
-    const request = SpecialOperationInfo.token.method(param[0]);
-    const res = await request.then(
-      (prms) => prms.value() as Promise<TokenResponse>,
-    );
-    const { access_token, refresh_token } = res;
+    public static async createToken(param: Parameters<typeof SpecialOperationInfo.token.method>[0]) {
+        if (!SpecialOperationInfo.token) {
+            return Promise.resolve();
+        }
 
-    access_token ? Auth.setAccessToken(access_token) : undefined;
-    refresh_token ? Auth.setRefreshToken(refresh_token) : undefined;
+        const res = await SpecialOperationInfo.token.method(param);
+        const { access_token, refresh_token } = await res.then(prms => prms.value() as Promise<TokenResponse>);
+        access_token ? Auth.setAccessToken(access_token) : undefined;
+        refresh_token ? Auth.setRefreshToken(refresh_token) : undefined;
 
-    return res;
-  }
+        return res;
+    }
 
-  /** get */
-  public static getAccessToken() {
-    return localStorage.getItem(Auth.TokenKeys.accessToken) || '';
-  }
-  public static getRefreshToken() {
-    return localStorage.getItem(Auth.TokenKeys.refreshToken) || '';
-  }
+    /** get */
+    public static getAccessToken() {
+        return localStorage.getItem(Auth.TokenKeys.accessToken) || '';
+    }
+    public static getRefreshToken() {
+        return localStorage.getItem(Auth.TokenKeys.refreshToken) || '';
+    }
 
-  /** set */
-  public static setAccessToken(token: string) {
-    localStorage.setItem(Auth.TokenKeys.accessToken, token);
-  }
-  public static setRefreshToken(token: string) {
-    localStorage.setItem(Auth.TokenKeys.refreshToken, token);
-  }
+    /** set */
+    public static setAccessToken(token: string) {
+        localStorage.setItem(Auth.TokenKeys.accessToken, token);
+    }
+    public static setRefreshToken(token: string) {
+        localStorage.setItem(Auth.TokenKeys.refreshToken, token);
+    }
 
-  /** delete */
-  public static deleteAccessToken() {
-    localStorage.removeItem(Auth.TokenKeys.accessToken);
-  }
-  public static deleteRefreshToken() {
-    localStorage.removeItem(Auth.TokenKeys.refreshToken);
-  }
+    /** delete */
+    public static deleteAccessToken() {
+        localStorage.removeItem(Auth.TokenKeys.accessToken);
+    }
+    public static deleteRefreshToken() {
+        localStorage.removeItem(Auth.TokenKeys.refreshToken);
+    }
 }
 
 export namespace Auth {
-  export enum TokenKeys {
-    accessToken = 'accessToken',
-    refreshToken = 'refreshToken',
-  }
+    export enum TokenKeys {
+        accessToken = 'accessToken',
+        refreshToken = 'refreshToken',
+    }
 }
 
 export interface LoginResponse {
-  grant_token: string;
-  status: number;
-  info: any;
-  messages: string[];
-  errors: string[];
+    grant_token: string;
+    status: number;
+    info: any;
+    messages: string[];
+    errors: string[];
 }
 
 export interface TokenResponse {
-  access_token: string;
-  refresh_token: string;
+    access_token: string;
+    refresh_token: string;
 }
 "
 `;
@@ -2093,11 +2088,13 @@ export class ComplexService {
             }
         }
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2120,11 +2117,13 @@ export class ComplexService {
             body: requestParam.requestBody,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2136,63 +2135,55 @@ export class ComplexService {
 
 export namespace ComplexService {
     export interface complexTypesRequest {
-        {
-            parameterObject,
-            parameterReference,
-        }: {
-            parameterObject: {
-                first?: {
-                    second?: {
-                        third?: string,
-                    },
+        parameterObject: {
+            first?: {
+                second?: {
+                    third?: string,
                 },
             },
-            parameterReference: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
-        }    };
-        export type complexTypesResponse = Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>;
-        export interface complexParamsRequest {
-            {
-                id,
-                requestBody,
-            }: {
-                id: number,
-                requestBody?: {
-                    readonly key: string | null,
-                    name: string | null,
-                    enabled?: boolean,
-                    readonly type: ('Monkey' | 'Horse' | 'Bird'),
-                    listOfModels?: Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> | null,
-                    listOfStrings?: Array<string> | null,
-                    parameters:  |  |  | ,
-                    readonly user?: {
-                        readonly id?: number,
-                        readonly name?: string | null,
-                    },
-                },
-            }    };
-            export type complexParamsResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString;
-        }
+        },
+        parameterReference: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
+    };
+    export type complexTypesResponse = Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>;
+    export interface complexParamsRequest {
+        id: number,
+        requestBody?: {
+            readonly key: string | null,
+            name: string | null,
+            enabled?: boolean,
+            readonly type: ('Monkey' | 'Horse' | 'Bird'),
+            listOfModels?: Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> | null,
+            listOfStrings?: Array<string> | null,
+            parameters:  |  |  | ,
+            readonly user?: {
+                readonly id?: number,
+                readonly name?: string | null,
+            },
+        },
+    };
+    export type complexParamsResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString;
+}
 
-        export const infos = [
-            {
-                path: '/api/v\${requestParam.apiVersion}/complex',
-                httpMethod: 'get',
-                class: ComplexService,
-                className: 'ComplexService',
-                method: ComplexService.complexTypes,
-                methodName: 'complexTypes',
-                auth: null,
-            },
-            {
-                path: '/api/v\${requestParam.apiVersion}/complex/\${requestParam.id}',
-                httpMethod: 'put',
-                class: ComplexService,
-                className: 'ComplexService',
-                method: ComplexService.complexParams,
-                methodName: 'complexParams',
-                auth: null,
-            },
-        ];"
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/complex',
+        httpMethod: 'get',
+        class: ComplexService,
+        className: 'ComplexService',
+        method: ComplexService.complexTypes,
+        methodName: 'complexTypes',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/complex/\${requestParam.id}',
+        httpMethod: 'put',
+        class: ComplexService,
+        className: 'ComplexService',
+        method: ComplexService.complexParams,
+        methodName: 'complexParams',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DefaultsService.ts): ./test/result/v3/services/DefaultsService.ts 1`] = `
@@ -2233,11 +2224,13 @@ export class DefaultsService {
             },
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2249,35 +2242,28 @@ export class DefaultsService {
 
 export namespace DefaultsService {
     export interface callWithDefaultParametersRequest {
-        {
-            parameterString = 'Hello World!',
-            parameterNumber = 123,
-            parameterBoolean = true,
-            parameterEnum = 'Success',
-            parameterModel = {
-                \\"prop\\": \\"Hello World\\"
-            },
-        }: {
-            parameterString: string | null,
-            parameterNumber: number | null,
-            parameterBoolean: boolean | null,
-            parameterEnum: ('Success' | 'Warning' | 'Error'),
-            parameterModel: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
-        }    };
-        export type callWithDefaultParametersResponse = void;
-    }
-
-    export const infos = [
-        {
-            path: '/api/v\${requestParam.apiVersion}/defaults',
-            httpMethod: 'get',
-            class: DefaultsService,
-            className: 'DefaultsService',
-            method: DefaultsService.callWithDefaultParameters,
-            methodName: 'callWithDefaultParameters',
-            auth: null,
+        parameterString: string | null = 'Hello World!',
+        parameterNumber: number | null = 123,
+        parameterBoolean: boolean | null = true,
+        parameterEnum: ('Success' | 'Warning' | 'Error') = 'Success',
+        parameterModel: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null = {
+            \\"prop\\": \\"Hello World\\"
         },
-    ];"
+    };
+    export type callWithDefaultParametersResponse = void;
+}
+
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/defaults',
+        httpMethod: 'get',
+        class: DefaultsService,
+        className: 'DefaultsService',
+        method: DefaultsService.callWithDefaultParameters,
+        methodName: 'callWithDefaultParameters',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./test/result/v3/services/DuplicateService.ts 1`] = `
@@ -2303,11 +2289,13 @@ export class DuplicateService {
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2326,11 +2314,13 @@ export class DuplicateService {
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2349,11 +2339,13 @@ export class DuplicateService {
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2372,11 +2364,13 @@ export class DuplicateService {
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2472,11 +2466,13 @@ export class HeaderService {
             }
         }
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2535,11 +2531,13 @@ export class MultipartService {
             path: \`/api/v\${requestParam.apiVersion}/multipart\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2618,11 +2616,13 @@ export class ParametersService {
             body: requestParam.requestBody,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2662,11 +2662,13 @@ export class ParametersService {
             body: requestParam.requestBody,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2691,11 +2693,13 @@ export class ParametersService {
             body: requestParam.requestBody,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2720,11 +2724,13 @@ export class ParametersService {
             body: requestParam.requestBody,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2736,99 +2742,74 @@ export class ParametersService {
 
 export namespace ParametersService {
     export interface callWithParametersRequest {
-        {
-            parameterHeader,
-            parameterQuery,
-            parameterForm,
-            parameterCookie,
-            requestBody,
-        }: {
-            parameterHeader: string | null,
-            parameterQuery: string | null,
-            parameterForm: string | null,
-            parameterCookie: string | null,
-            requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
-        }    };
-        export type callWithParametersResponse = void;
-        export interface callWithWeirdParameterNamesRequest {
-            {
-                parameterHeader,
-                parameterQuery,
-                parameterForm,
-                parameterCookie,
-                requestBody,
-                parameterPath1,
-                parameterPath2,
-                parameterPath3,
-            }: {
-                parameterHeader: string | null,
-                parameterQuery: string | null,
-                parameterForm: string | null,
-                parameterCookie: string | null,
-                requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
-                parameterPath1?: string,
-                parameterPath2?: string,
-                parameterPath3?: string,
-            }    };
-            export type callWithWeirdParameterNamesResponse = void;
-            export interface getCallWithOptionalParamRequest {
-                {
-                    requestBody,
-                    parameter,
-                }: {
-                    requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
-                    parameter?: string,
-                }    };
-                export type getCallWithOptionalParamResponse = void;
-                export interface postCallWithOptionalParamRequest {
-                    {
-                        parameter,
-                        requestBody,
-                    }: {
-                        parameter: string,
-                        requestBody?: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
-                    }    };
-                    export type postCallWithOptionalParamResponse = void;
-                }
+        parameterHeader: string | null,
+        parameterQuery: string | null,
+        parameterForm: string | null,
+        parameterCookie: string | null,
+        requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
+    };
+    export type callWithParametersResponse = void;
+    export interface callWithWeirdParameterNamesRequest {
+        parameterHeader: string | null,
+        parameterQuery: string | null,
+        parameterForm: string | null,
+        parameterCookie: string | null,
+        requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
+        parameterPath1?: string,
+        parameterPath2?: string,
+        parameterPath3?: string,
+    };
+    export type callWithWeirdParameterNamesResponse = void;
+    export interface getCallWithOptionalParamRequest {
+        requestBody: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
+        parameter?: string,
+    };
+    export type getCallWithOptionalParamResponse = void;
+    export interface postCallWithOptionalParamRequest {
+        parameter: string,
+        requestBody?: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
+    };
+    export type postCallWithOptionalParamResponse = void;
+}
 
-                export const infos = [
-                    {
-                        path: '/api/v\${requestParam.apiVersion}/parameters',
-                        httpMethod: 'get',
-                        class: ParametersService,
-                        className: 'ParametersService',
-                        method: ParametersService.callWithParameters,
-                        methodName: 'callWithParameters',
-                        auth: null,
-                    },
-                    {
-                        path: '/api/v\${requestParam.apiVersion}/parameters/\${requestParam.parameterPath1}/\${requestParam.parameterPath2}/\${requestParam.parameterPath3}',
-                        httpMethod: 'get',
-                        class: ParametersService,
-                        className: 'ParametersService',
-                        method: ParametersService.callWithWeirdParameterNames,
-                        methodName: 'callWithWeirdParameterNames',
-                        auth: null,
-                    },
-                    {
-                        path: '/api/v\${requestParam.apiVersion}/parameters/',
-                        httpMethod: 'get',
-                        class: ParametersService,
-                        className: 'ParametersService',
-                        method: ParametersService.getCallWithOptionalParam,
-                        methodName: 'getCallWithOptionalParam',
-                        auth: null,
-                    },
-                    {
-                        path: '/api/v\${requestParam.apiVersion}/parameters/',
-                        httpMethod: 'post',
-                        class: ParametersService,
-                        className: 'ParametersService',
-                        method: ParametersService.postCallWithOptionalParam,
-                        methodName: 'postCallWithOptionalParam',
-                        auth: null,
-                    },
-                ];"
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/parameters',
+        httpMethod: 'get',
+        class: ParametersService,
+        className: 'ParametersService',
+        method: ParametersService.callWithParameters,
+        methodName: 'callWithParameters',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/parameters/\${requestParam.parameterPath1}/\${requestParam.parameterPath2}/\${requestParam.parameterPath3}',
+        httpMethod: 'get',
+        class: ParametersService,
+        className: 'ParametersService',
+        method: ParametersService.callWithWeirdParameterNames,
+        methodName: 'callWithWeirdParameterNames',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/parameters/',
+        httpMethod: 'get',
+        class: ParametersService,
+        className: 'ParametersService',
+        method: ParametersService.getCallWithOptionalParam,
+        methodName: 'getCallWithOptionalParam',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/parameters/',
+        httpMethod: 'post',
+        class: ParametersService,
+        className: 'ParametersService',
+        method: ParametersService.postCallWithOptionalParam,
+        methodName: 'postCallWithOptionalParam',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/ResponseService.ts): ./test/result/v3/services/ResponseService.ts 1`] = `
@@ -2858,11 +2839,13 @@ export class ResponseService {
             path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2889,11 +2872,13 @@ export class ResponseService {
             }
         }
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -2922,11 +2907,13 @@ export class ResponseService {
             }
         }
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3002,11 +2989,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3025,11 +3014,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3048,11 +3039,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3071,11 +3064,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3094,11 +3089,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3117,11 +3114,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3140,11 +3139,13 @@ export class SimpleService {
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3289,11 +3290,13 @@ export class TypesService {
             },
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3305,39 +3308,29 @@ export class TypesService {
 
 export namespace TypesService {
     export interface typesRequest {
-        {
-            parameterNumber = 123,
-            parameterString = 'default',
-            parameterBoolean = true,
-            parameterObject = null,
-            parameterArray,
-            parameterDictionary,
-            parameterEnum,
-            id,
-        }: {
-            parameterNumber: number,
-            parameterString: string | null,
-            parameterBoolean: boolean | null,
-            parameterObject: any,
-            parameterArray: Array<string> | null,
-            parameterDictionary: any,
-            parameterEnum: ('Success' | 'Warning' | 'Error') | null,
-            id?: number,
-        }    };
-        export type typesResponse = number | string | boolean | any;
-    }
+        parameterNumber: number = 123,
+        parameterString: string | null = 'default',
+        parameterBoolean: boolean | null = true,
+        parameterObject: any = null,
+        parameterArray: Array<string> | null,
+        parameterDictionary: any,
+        parameterEnum: ('Success' | 'Warning' | 'Error') | null,
+        id?: number,
+    };
+    export type typesResponse = number | string | boolean | any;
+}
 
-    export const infos = [
-        {
-            path: '/api/v\${requestParam.apiVersion}/types',
-            httpMethod: 'get',
-            class: TypesService,
-            className: 'TypesService',
-            method: TypesService.types,
-            methodName: 'types',
-            auth: null,
-        },
-    ];"
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/types',
+        httpMethod: 'get',
+        class: TypesService,
+        className: 'TypesService',
+        method: TypesService.types,
+        methodName: 'types',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/result/v3/services/UploadService.ts 1`] = `
@@ -3368,11 +3361,13 @@ export class UploadService {
             },
         });
 
+        const security = {
+        };
         const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
 
         const result = await request().then(result => {
             if (shouldHookToken && result.status === 401) {
-                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+                return Auth.loginWithStoredToken({ requestBody: {} }).then(async () => await request());
             }
             return result;
         });
@@ -3384,23 +3379,20 @@ export class UploadService {
 
 export namespace UploadService {
     export interface uploadFileRequest {
-        {
-            file,
-        }: {
-            file: File,
-        }    };
-        export type uploadFileResponse = boolean;
-    }
+        file: File,
+    };
+    export type uploadFileResponse = boolean;
+}
 
-    export const infos = [
-        {
-            path: '/api/v\${requestParam.apiVersion}/upload',
-            httpMethod: 'post',
-            class: UploadService,
-            className: 'UploadService',
-            method: UploadService.uploadFile,
-            methodName: 'uploadFile',
-            auth: null,
-        },
-    ];"
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/upload',
+        httpMethod: 'post',
+        class: UploadService,
+        className: 'UploadService',
+        method: UploadService.uploadFile,
+        methodName: 'uploadFile',
+        auth: null,
+    },
+];"
 `;

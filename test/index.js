@@ -21,7 +21,6 @@ function compile(dir) {
 OpenAPI.generate({
     input: './test/mock/v3/spec.json',
     output: './test/result/v3/',
-    useOptions: true,
     useUnionTypes: true,
     exportSchemas: true,
     exportServices: true,

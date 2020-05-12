@@ -20,22 +20,12 @@ function copySupportFile(filePath: string, outputPath: string): void {
  * @param client Client object with all the models, services, etc.
  * @param templates Templates wrapper with all loaded Handlebars templates.
  * @param output Directory to write the generated files to.
- * @param useOptions Use options or arguments functions.
  * @param exportCore: Generate core.
  * @param exportServices: Generate services.
  * @param exportModels: Generate models.
  * @param exportSchemas: Generate schemas.
  */
-export function writeClient(
-    client: Client,
-    templates: Templates,
-    output: string,
-    useOptions: boolean,
-    exportCore: boolean,
-    exportServices: boolean,
-    exportModels: boolean,
-    exportSchemas: boolean
-): void {
+export function writeClient(client: Client, templates: Templates, output: string, exportCore: boolean, exportServices: boolean, exportModels: boolean, exportSchemas: boolean): void {
     const outputPath = path.resolve(process.cwd(), output);
     const outputPathCore = path.resolve(outputPath, 'core');
     const outputPathModels = path.resolve(outputPath, 'models');
@@ -64,7 +54,7 @@ export function writeClient(
         mkdirp.sync(outputPathServices);
         writeApiInfo(client.services, templates, outputPathCore);
         writeClientSettings(client, templates, outputPathCore);
-        writeClientServices(client.services, templates, outputPathServices, useOptions);
+        writeClientServices(client.services, templates, outputPathServices);
     }
 
     if (exportSchemas) {

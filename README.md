@@ -73,37 +73,6 @@ OpenAPI.generate({
 
 ## Features
 
-### Argument-style vs. Object-style
-
-There's no [named parameter](https://en.wikipedia.org/wiki/Named_parameter) in Javascript or Typescript, because of
-that, we offer the flag `--useOptions` to generate code in two different styles.
-
-Argument-style:
-
-```typescript
-function createUser(name: string, password: string, type?: string, address?: string) {
-    // ...
-}
-
-// Usage
-createUser('Jack', '123456', undefined, 'NY US');
-```
-
-Object-style:
-
-```typescript
-function createUser({ name, password, type, address }: { name: string; password: string; type?: string; address?: string }) {
-    // ...
-}
-
-// Usage
-createUser({
-    name: 'Jack',
-    password: '123456',
-    address: 'NY US',
-});
-```
-
 ### Runtime schemas
 
 By default the OpenAPI generator only exports interfaces for your models. These interfaces will help you during

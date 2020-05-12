@@ -10,7 +10,6 @@ program
     .version(pkg.version)
     .option('--input [value]', 'Path to swagger specification', './spec.json')
     .option('--output [value]', 'Output directory', './generated')
-    .option('--useOptions', 'Use options vs arguments style functions', false)
     .option('--useUnionTypes', 'Use inclusive union types', false)
     .option('--exportCore', 'Generate core', true)
     .option('--exportServices', 'Generate services', true)
@@ -24,7 +23,6 @@ if (OpenAPI) {
     OpenAPI.generate({
         input: program.input,
         output: program.output,
-        useOptions: program.useOptions,
         useUnionTypes: program.useUnionTypes,
         exportCore: program.exportCore,
         exportServices: program.exportServices,
