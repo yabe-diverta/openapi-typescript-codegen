@@ -148,6 +148,7 @@ export function getModel(openApi: OpenApi, definition: OpenApiSchema, isDefiniti
         model.enum = iter.enum;
         model.enums = iter.enums;
         model.properties = iter.properties;
+
         return model;
     }
 
@@ -185,6 +186,7 @@ export function getModel(openApi: OpenApi, definition: OpenApiSchema, isDefiniti
         model.enum = iter.enum;
         model.enums = iter.enums;
         model.properties = iter.properties;
+
         return model;
     }
 
