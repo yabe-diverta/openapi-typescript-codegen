@@ -12,7 +12,6 @@ program
     .option('--output [value]', 'Output directory', './generated')
     .option('--useUnionTypes', 'Use inclusive union types', false)
     .option('--exportCore', 'Generate core', true)
-    .option('--exportServices', 'Generate services', true)
     .option('--exportSchemas', 'Generate schemas', false)
     .parse(process.argv);
 
@@ -24,7 +23,6 @@ if (OpenAPI) {
         output: program.output,
         useUnionTypes: program.useUnionTypes,
         exportCore: program.exportCore,
-        exportServices: program.exportServices,
         exportSchemas: program.exportSchemas,
     });
 }

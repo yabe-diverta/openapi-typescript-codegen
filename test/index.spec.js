@@ -10,7 +10,6 @@ describe('generation', () => {
             useUnionTypes: true,
             exportCore: true,
             exportSchemas: true,
-            exportServices: true,
         });
 
         test.each(glob.sync('./test/result/v3/**/*.ts').map(file => [file]))('file(%s)', file => {

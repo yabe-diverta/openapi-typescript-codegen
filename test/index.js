@@ -23,7 +23,6 @@ OpenAPI.generate({
     output: './test/result/v3/',
     useUnionTypes: true,
     exportSchemas: true,
-    exportServices: true,
 });
 
 compile('./test/result/v3/');

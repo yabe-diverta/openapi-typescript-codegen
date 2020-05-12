@@ -21,10 +21,9 @@ function copySupportFile(filePath: string, outputPath: string): void {
  * @param templates Templates wrapper with all loaded Handlebars templates.
  * @param output Directory to write the generated files to.
  * @param exportCore: Generate core.
- * @param exportServices: Generate services.
  * @param exportSchemas: Generate schemas.
  */
-export function writeClient(client: Client, templates: Templates, output: string, exportCore: boolean, exportServices: boolean, exportSchemas: boolean): void {
+export function writeClient(client: Client, templates: Templates, output: string, exportCore: boolean, exportSchemas: boolean): void {
     const outputPath = path.resolve(process.cwd(), output);
     const outputPathCore = path.resolve(outputPath, 'core');
     const outputPathModels = path.resolve(outputPath, 'models');
@@ -49,12 +48,10 @@ export function writeClient(client: Client, templates: Templates, output: string
         copySupportFile('core/Result.ts', outputPath);
     }
 
-    if (exportServices) {
-        mkdirp.sync(outputPathServices);
-        writeApiInfo(client.services, templates, outputPathCore);
-        writeClientSettings(client, templates, outputPathCore);
-        writeClientServices(client.services, templates, outputPathServices);
-    }
+    mkdirp.sync(outputPathServices);
+    writeApiInfo(client.services, templates, outputPathCore);
+    writeClientSettings(client, templates, outputPathCore);
+    writeClientServices(client.services, templates, outputPathServices);
 
     if (exportSchemas) {
         mkdirp.sync(outputPathSchemas);
@@ -65,5 +62,5 @@ export function writeClient(client: Client, templates: Templates, output: string
     copySupportFile('models/Dictionary.ts', outputPath);
     writeClientModels(client.models, templates, outputPathModels);
 
-    writeClientIndex(client, templates, outputPath, exportCore, exportServices, exportSchemas);
+    writeClientIndex(client, templates, outputPath, exportCore, exportSchemas);
 }

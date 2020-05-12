@@ -22,11 +22,9 @@ export { ${{{this}}} } from './schemas/${{{this}}}';
 {{/each}}
 {{/if}}
 {{/if}}
-{{#if exportServices}}
-{{#if services}}
 
+{{#if services}}
 {{#each services}}
 export { {{{this}}} } from './services/{{{this}}}';
 {{/each}}
-{{/if}}
 {{/if}}
