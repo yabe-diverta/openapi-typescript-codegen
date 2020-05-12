@@ -20,10 +20,9 @@ function copySupportFile(filePath: string, outputPath: string): void {
  * @param client Client object with all the models, services, etc.
  * @param templates Templates wrapper with all loaded Handlebars templates.
  * @param output Directory to write the generated files to.
- * @param exportCore: Generate core.
  * @param exportSchemas: Generate schemas.
  */
-export function writeClient(client: Client, templates: Templates, output: string, exportCore: boolean, exportSchemas: boolean): void {
+export function writeClient(client: Client, templates: Templates, output: string, exportSchemas: boolean): void {
     const outputPath = path.resolve(process.cwd(), output);
     const outputPathCore = path.resolve(outputPath, 'core');
     const outputPathModels = path.resolve(outputPath, 'models');
@@ -34,19 +33,17 @@ export function writeClient(client: Client, templates: Templates, output: string
     rimraf.sync(outputPath);
     mkdirp.sync(outputPath);
 
-    if (exportCore) {
-        mkdirp.sync(outputPathCore);
-        copySupportFile('core/ApiError.ts', outputPath);
-        copySupportFile('core/Auth.ts', outputPath);
-        copySupportFile('core/getFormData.ts', outputPath);
-        copySupportFile('core/getQueryString.ts', outputPath);
-        copySupportFile('core/isSuccess.ts', outputPath);
-        copySupportFile('core/OpenAPI.hbs', outputPath);
-        copySupportFile('core/request.ts', outputPath);
-        copySupportFile('core/RequestOptions.ts', outputPath);
-        copySupportFile('core/requestUsingFetch.ts', outputPath);
-        copySupportFile('core/Result.ts', outputPath);
-    }
+    mkdirp.sync(outputPathCore);
+    copySupportFile('core/ApiError.ts', outputPath);
+    copySupportFile('core/Auth.ts', outputPath);
+    copySupportFile('core/getFormData.ts', outputPath);
+    copySupportFile('core/getQueryString.ts', outputPath);
+    copySupportFile('core/isSuccess.ts', outputPath);
+    copySupportFile('core/OpenAPI.hbs', outputPath);
+    copySupportFile('core/request.ts', outputPath);
+    copySupportFile('core/RequestOptions.ts', outputPath);
+    copySupportFile('core/requestUsingFetch.ts', outputPath);
+    copySupportFile('core/Result.ts', outputPath);
 
     mkdirp.sync(outputPathServices);
     writeApiInfo(client.services, templates, outputPathCore);
@@ -62,5 +59,5 @@ export function writeClient(client: Client, templates: Templates, output: string
     copySupportFile('models/Dictionary.ts', outputPath);
     writeClientModels(client.models, templates, outputPathModels);
 
-    writeClientIndex(client, templates, outputPath, exportCore, exportSchemas);
+    writeClientIndex(client, templates, outputPath, exportSchemas);
 }

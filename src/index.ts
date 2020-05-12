@@ -9,7 +9,6 @@ export interface Options {
     input: string | Record<string, any>;
     output: string;
     useUnionTypes?: boolean;
-    exportCore?: boolean;
     exportSchemas?: boolean;
     write?: boolean;
 }
@@ -21,11 +20,10 @@ export interface Options {
  * @param input The relative location of the OpenAPI spec.
  * @param output The relative location of the output directory.
  * @param useUnionTypes Use inclusive union types.
- * @param exportCore: Generate core client classes.
  * @param exportSchemas: Generate schemas.
  * @param write Write the files to disk (true or false).
  */
-export function generate({ input, output, useUnionTypes = false, exportCore = true, exportSchemas = false, write = true }: Options): void {
+export function generate({ input, output, useUnionTypes = false, exportSchemas = false, write = true }: Options): void {
     try {
         // Load the specification, load the handlebar templates for the given language
         const openApi = isString(input) ? getOpenApiSpec(input) : input;
@@ -34,7 +32,7 @@ export function generate({ input, output, useUnionTypes = false, exportCore = tr
         const client = parseV3(openApi);
         const clientFinal = postProcessClient(client, useUnionTypes);
         if (write) {
-            writeClient(clientFinal, templates, output, exportCore, exportSchemas);
+            writeClient(clientFinal, templates, output, exportSchemas);
         }
     } catch (e) {
         console.error(e);

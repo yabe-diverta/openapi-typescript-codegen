@@ -8,7 +8,6 @@ describe('generation', () => {
             input: './test/mock/v3/spec.json',
             output: './test/result/v3/',
             useUnionTypes: true,
-            exportCore: true,
             exportSchemas: true,
         });
 

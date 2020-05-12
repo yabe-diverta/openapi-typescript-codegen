@@ -11,7 +11,6 @@ program
     .option('--input [value]', 'Path to swagger specification', './spec.json')
     .option('--output [value]', 'Output directory', './generated')
     .option('--useUnionTypes', 'Use inclusive union types', false)
-    .option('--exportCore', 'Generate core', true)
     .option('--exportSchemas', 'Generate schemas', false)
     .parse(process.argv);
 
@@ -22,7 +21,6 @@ if (OpenAPI) {
         input: program.input,
         output: program.output,
         useUnionTypes: program.useUnionTypes,
-        exportCore: program.exportCore,
         exportSchemas: program.exportSchemas,
     });
 }
