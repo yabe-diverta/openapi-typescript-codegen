@@ -7,7 +7,6 @@ describe('generation', () => {
         OpenAPI.generate({
             input: './test/mock/v3/spec.json',
             output: './test/result/v3/',
-            exportSchemas: true,
         });
 
         test.each(glob.sync('./test/result/v3/**/*.ts').map(file => [file]))('file(%s)', file => {

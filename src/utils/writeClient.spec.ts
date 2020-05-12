@@ -33,7 +33,7 @@ describe('writeClient', () => {
             apiInfo: () => 'dummy',
         };
 
-        writeClient(client, templates, '/', false, true, true, true);
+        writeClient(client, templates, '/');
 
         expect(rimrafSync).toBeCalled();
         expect(mkdirpSync).toBeCalled();

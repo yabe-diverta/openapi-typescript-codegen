@@ -13,13 +13,10 @@ export { {{{this}}} } from './models/{{{this}}}';
 {{/each}}
 {{/if}}
 
-{{#if exportSchemas}}
 {{#if models}}
-
 {{#each models}}
 export { ${{{this}}} } from './schemas/${{{this}}}';
 {{/each}}
-{{/if}}
 {{/if}}
 
 {{#if services}}

@@ -123,8 +123,8 @@ export interface MyModel {
 The interface does not contain any properties like `maxLength` or `pattern`. However they could be useful
 if we wanted to create some form where a user could create such a model. In that form you would iterate
 over the properties to render form fields based on their type and validate the input based on the `maxLength`
-or `pattern` property. This requires us to have this information somewhere... For this we can use the
-flag `--exportSchemas` to generate a runtime model next to the normal interface:
+or `pattern` property. This requires us to have this information somewhere... For this we generate a runtime model
+next to the normal interface:
 
 ```typescript
 export const $MyModel = {

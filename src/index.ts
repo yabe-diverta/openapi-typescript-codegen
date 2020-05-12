@@ -8,7 +8,6 @@ import { writeClient } from './utils/writeClient';
 export interface Options {
     input: string | Record<string, any>;
     output: string;
-    exportSchemas?: boolean;
     write?: boolean;
 }
 
@@ -18,10 +17,9 @@ export interface Options {
  * service layer, etc.
  * @param input The relative location of the OpenAPI spec.
  * @param output The relative location of the output directory.
- * @param exportSchemas: Generate schemas.
  * @param write Write the files to disk (true or false).
  */
-export function generate({ input, output, exportSchemas = false, write = true }: Options): void {
+export function generate({ input, output, write = true }: Options): void {
     try {
         // Load the specification, load the handlebar templates for the given language
         const openApi = isString(input) ? getOpenApiSpec(input) : input;
@@ -30,7 +28,7 @@ export function generate({ input, output, exportSchemas = false, write = true }:
         const client = parseV3(openApi);
         const clientFinal = postProcessClient(client);
         if (write) {
-            writeClient(clientFinal, templates, output, exportSchemas);
+            writeClient(clientFinal, templates, output);
         }
     } catch (e) {
         console.error(e);

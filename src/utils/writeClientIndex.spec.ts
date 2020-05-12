@@ -15,6 +15,7 @@ describe('writeClientIndex', () => {
             version: '1.0',
             models: [],
             services: [],
+            security: {},
         };
 
         const templates: Templates = {
@@ -23,9 +24,10 @@ describe('writeClientIndex', () => {
             schema: () => 'dummy',
             service: () => 'dummy',
             settings: () => 'dummy',
+            apiInfo: () => 'dummy',
         };
 
-        writeClientIndex(client, templates, '/', true, true, true, true);
+        writeClientIndex(client, templates, '/');
 
         expect(fsWriteFileSync).toBeCalledWith('/index.ts', 'dummy');
     });
