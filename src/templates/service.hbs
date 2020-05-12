@@ -119,6 +119,7 @@ export namespace {{{name}}} {
 {{/each}}
 }
 
+{{#if exportApiInformations}}
 export const infos = [
 {{#each operations}}
     {
@@ -129,6 +130,15 @@ export const infos = [
     method: {{{../name}}}.{{{name}}},
     methodName: '{{{name}}}',
     auth: {{#if type}}'{{type}}'{{else}}null{{/if}},
+    description: `
+        export interface {{{name}}}Request {
+        {{#each parameters}}
+        {{/each}}
+        {{>parameters}}
+        };
+        export type {{{name}}}Response = {{>result}};
+    `,
     },
 {{/each}}
 ];
+{{/if}}

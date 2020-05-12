@@ -67,29 +67,17 @@ exports[`generation v3 file(./test/result/v3/core/ApiInfo.ts): ./test/result/v3/
 /* eslint-disable */
 /* prettier-ignore */
 
-import { SimpleService, infos as SimpleServiceInfo } from '../services/SimpleService';
-import { ParametersService, infos as ParametersServiceInfo } from '../services/ParametersService';
-import { DefaultsService, infos as DefaultsServiceInfo } from '../services/DefaultsService';
-import { DuplicateService, infos as DuplicateServiceInfo } from '../services/DuplicateService';
-import { ResponseService, infos as ResponseServiceInfo } from '../services/ResponseService';
-import { TypesService, infos as TypesServiceInfo } from '../services/TypesService';
-import { UploadService, infos as UploadServiceInfo } from '../services/UploadService';
-import { ComplexService, infos as ComplexServiceInfo } from '../services/ComplexService';
-import { MultipartService, infos as MultipartServiceInfo } from '../services/MultipartService';
-import { HeaderService, infos as HeaderServiceInfo } from '../services/HeaderService';
+import { SimpleService } from '../services/SimpleService';
+import { ParametersService } from '../services/ParametersService';
+import { DefaultsService } from '../services/DefaultsService';
+import { DuplicateService } from '../services/DuplicateService';
+import { ResponseService } from '../services/ResponseService';
+import { TypesService } from '../services/TypesService';
+import { UploadService } from '../services/UploadService';
+import { ComplexService } from '../services/ComplexService';
+import { MultipartService } from '../services/MultipartService';
+import { HeaderService } from '../services/HeaderService';
 
-export const ApiInfos = [
-    ...SimpleServiceInfo,
-    ...ParametersServiceInfo,
-    ...DefaultsServiceInfo,
-    ...DuplicateServiceInfo,
-    ...ResponseServiceInfo,
-    ...TypesServiceInfo,
-    ...UploadServiceInfo,
-    ...ComplexServiceInfo,
-    ...MultipartServiceInfo,
-    ...HeaderServiceInfo,
-];
 
 export const SpecialOperationInfo = {
     login: null,
@@ -2153,26 +2141,7 @@ export namespace ComplexService {
     export type complexParamsResponse = ModelWithString;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/complex',
-        httpMethod: 'get',
-        class: ComplexService,
-        className: 'ComplexService',
-        method: ComplexService.complexTypes,
-        methodName: 'complexTypes',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/complex/\${requestParam.id}',
-        httpMethod: 'put',
-        class: ComplexService,
-        className: 'ComplexService',
-        method: ComplexService.complexParams,
-        methodName: 'complexParams',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DefaultsService.ts): ./test/result/v3/services/DefaultsService.ts 1`] = `
@@ -2240,17 +2209,7 @@ export namespace DefaultsService {
     export type callWithDefaultParametersResponse = void;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/defaults',
-        httpMethod: 'get',
-        class: DefaultsService,
-        className: 'DefaultsService',
-        method: DefaultsService.callWithDefaultParameters,
-        methodName: 'callWithDefaultParameters',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./test/result/v3/services/DuplicateService.ts 1`] = `
@@ -2382,44 +2341,7 @@ export namespace DuplicateService {
     export type duplicateNameResponse = void;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/duplicate',
-        httpMethod: 'get',
-        class: DuplicateService,
-        className: 'DuplicateService',
-        method: DuplicateService.duplicateName,
-        methodName: 'duplicateName',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/duplicate',
-        httpMethod: 'post',
-        class: DuplicateService,
-        className: 'DuplicateService',
-        method: DuplicateService.duplicateName,
-        methodName: 'duplicateName',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/duplicate',
-        httpMethod: 'put',
-        class: DuplicateService,
-        className: 'DuplicateService',
-        method: DuplicateService.duplicateName,
-        methodName: 'duplicateName',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/duplicate',
-        httpMethod: 'delete',
-        class: DuplicateService,
-        className: 'DuplicateService',
-        method: DuplicateService.duplicateName,
-        methodName: 'duplicateName',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/HeaderService.ts): ./test/result/v3/services/HeaderService.ts 1`] = `
@@ -2475,17 +2397,7 @@ export namespace HeaderService {
     export type callWithResultFromHeaderResponse = string;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/header',
-        httpMethod: 'post',
-        class: HeaderService,
-        className: 'HeaderService',
-        method: HeaderService.callWithResultFromHeader,
-        methodName: 'callWithResultFromHeader',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/MultipartService.ts): ./test/result/v3/services/MultipartService.ts 1`] = `
@@ -2546,17 +2458,7 @@ export namespace MultipartService {
     };
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/multipart',
-        httpMethod: 'get',
-        class: MultipartService,
-        className: 'MultipartService',
-        method: MultipartService.multipartResponse,
-        methodName: 'multipartResponse',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/ParametersService.ts): ./test/result/v3/services/ParametersService.ts 1`] = `
@@ -2760,44 +2662,7 @@ export namespace ParametersService {
     export type postCallWithOptionalParamResponse = void;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/parameters',
-        httpMethod: 'get',
-        class: ParametersService,
-        className: 'ParametersService',
-        method: ParametersService.callWithParameters,
-        methodName: 'callWithParameters',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/parameters/\${requestParam.parameterPath1}/\${requestParam.parameterPath2}/\${requestParam.parameterPath3}',
-        httpMethod: 'get',
-        class: ParametersService,
-        className: 'ParametersService',
-        method: ParametersService.callWithWeirdParameterNames,
-        methodName: 'callWithWeirdParameterNames',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/parameters/',
-        httpMethod: 'get',
-        class: ParametersService,
-        className: 'ParametersService',
-        method: ParametersService.getCallWithOptionalParam,
-        methodName: 'getCallWithOptionalParam',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/parameters/',
-        httpMethod: 'post',
-        class: ParametersService,
-        className: 'ParametersService',
-        method: ParametersService.postCallWithOptionalParam,
-        methodName: 'postCallWithOptionalParam',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/ResponseService.ts): ./test/result/v3/services/ResponseService.ts 1`] = `
@@ -2925,35 +2790,7 @@ export namespace ResponseService {
     export type callWithResponsesResponse = ModelWithString | ModelThatExtends | ModelThatExtendsExtends;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/response',
-        httpMethod: 'get',
-        class: ResponseService,
-        className: 'ResponseService',
-        method: ResponseService.callWithResponse,
-        methodName: 'callWithResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/response',
-        httpMethod: 'post',
-        class: ResponseService,
-        className: 'ResponseService',
-        method: ResponseService.callWithDuplicateResponses,
-        methodName: 'callWithDuplicateResponses',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/response',
-        httpMethod: 'put',
-        class: ResponseService,
-        className: 'ResponseService',
-        method: ResponseService.callWithResponses,
-        methodName: 'callWithResponses',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/SimpleService.ts): ./test/result/v3/services/SimpleService.ts 1`] = `
@@ -3169,71 +3006,7 @@ export namespace SimpleService {
     export type patchCallWithoutParametersAndResponseResponse = void;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'get',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.getCallWithoutParametersAndResponse,
-        methodName: 'getCallWithoutParametersAndResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'put',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.putCallWithoutParametersAndResponse,
-        methodName: 'putCallWithoutParametersAndResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'post',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.postCallWithoutParametersAndResponse,
-        methodName: 'postCallWithoutParametersAndResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'delete',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.deleteCallWithoutParametersAndResponse,
-        methodName: 'deleteCallWithoutParametersAndResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'options',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.optionsCallWithoutParametersAndResponse,
-        methodName: 'optionsCallWithoutParametersAndResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'head',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.headCallWithoutParametersAndResponse,
-        methodName: 'headCallWithoutParametersAndResponse',
-        auth: null,
-    },
-    {
-        path: '/api/v\${requestParam.apiVersion}/simple',
-        httpMethod: 'patch',
-        class: SimpleService,
-        className: 'SimpleService',
-        method: SimpleService.patchCallWithoutParametersAndResponse,
-        methodName: 'patchCallWithoutParametersAndResponse',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/TypesService.ts): ./test/result/v3/services/TypesService.ts 1`] = `
@@ -3310,17 +3083,7 @@ export namespace TypesService {
     export type typesResponse = number | string | boolean | any;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/types',
-        httpMethod: 'get',
-        class: TypesService,
-        className: 'TypesService',
-        method: TypesService.types,
-        methodName: 'types',
-        auth: null,
-    },
-];"
+"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/result/v3/services/UploadService.ts 1`] = `
@@ -3374,15 +3137,5 @@ export namespace UploadService {
     export type uploadFileResponse = boolean;
 }
 
-export const infos = [
-    {
-        path: '/api/v\${requestParam.apiVersion}/upload',
-        httpMethod: 'post',
-        class: UploadService,
-        className: 'UploadService',
-        method: UploadService.uploadFile,
-        methodName: 'uploadFile',
-        auth: null,
-    },
-];"
+"
 `;

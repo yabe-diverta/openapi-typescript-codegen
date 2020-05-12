@@ -11,8 +11,9 @@ import { Operation } from '../client/interfaces/Operation';
  * @param services Array of Services to write.
  * @param templates The loaded handlebar templates.
  * @param outputPath Directory to write the generated files to.
+ * @param exportApiInformations Generate API informations.
  */
-export function writeApiInfo(services: Service[], templates: Templates, outputPath: string): void {
+export function writeApiInfo(services: Service[], templates: Templates, outputPath: string, exportApiInformations = false): void {
     const file = path.resolve(outputPath, `ApiInfo.ts`);
 
     function pickSpecialOperation(type: string): any | null {
@@ -36,6 +37,7 @@ export function writeApiInfo(services: Service[], templates: Templates, outputPa
     }
 
     const templateResult = templates.apiInfo({
+        exportApiInformations,
         services,
         specialOperation: {
             login: pickSpecialOperation('LOGIN'),

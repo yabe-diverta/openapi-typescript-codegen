@@ -6,7 +6,12 @@ const path = require('path');
 const program = require('commander');
 const pkg = require('../package.json');
 
-program.version(pkg.version).option('--input [value]', 'Path to swagger specification', './spec.json').option('--output [value]', 'Output directory', './generated').parse(process.argv);
+program
+    .version(pkg.version)
+    .option('--input [value]', 'Path to swagger specification', './spec.json')
+    .option('--output [value]', 'Output directory', './generated')
+    .option('--exportApiInformations [value]', 'Generate API informatinos', false)
+    .parse(process.argv);
 
 const OpenAPI = require(path.resolve(__dirname, '../dist/index.js'));
 
@@ -14,5 +19,6 @@ if (OpenAPI) {
     OpenAPI.generate({
         input: program.input,
         output: program.output,
+        exportApiInformations: program.exportApiInformations,
     });
 }

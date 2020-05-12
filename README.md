@@ -227,3 +227,18 @@ import { OpenAPI } from './generated';
 
 OpenAPI.TOKEN = 'some-bearer-token';
 ```
+
+### Generates API informations
+
+We provides a way to generate details of each endpoints for investigating all endpoints like e2e testing.  
+This may helps to get any infoemations cross-functionally.
+
+```typescript
+const AuthenticationalGetResponseExamples = [];
+ApiInfos.filter(info => info.className === 'AuthenticationService')
+    .filter(info => info.httpMethod === 'get')
+    .forEach(async info => {
+        const res = await info.method({ requestBody: {} } as any);
+        AuthenticationalGetResponseExamples.push(res);
+    });
+```

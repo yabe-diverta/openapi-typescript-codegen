@@ -21,7 +21,7 @@ function copySupportFile(filePath: string, outputPath: string): void {
  * @param templates Templates wrapper with all loaded Handlebars templates.
  * @param output Directory to write the generated files to.
  */
-export function writeClient(client: Client, templates: Templates, output: string): void {
+export function writeClient(client: Client, templates: Templates, output: string, exportApiInformations: boolean = false): void {
     const outputPath = path.resolve(process.cwd(), output);
     const outputPathCore = path.resolve(outputPath, 'core');
     const outputPathModels = path.resolve(outputPath, 'models');
@@ -45,9 +45,9 @@ export function writeClient(client: Client, templates: Templates, output: string
     copySupportFile('core/Result.ts', outputPath);
 
     mkdirp.sync(outputPathServices);
-    writeApiInfo(client.services, templates, outputPathCore);
+    writeApiInfo(client.services, templates, outputPathCore, exportApiInformations);
     writeClientSettings(client, templates, outputPathCore);
-    writeClientServices(client.services, templates, outputPathServices);
+    writeClientServices(client.services, templates, outputPathServices, exportApiInformations);
 
     mkdirp.sync(outputPathSchemas);
     writeClientSchemas(client.models, templates, outputPathSchemas);

@@ -4,7 +4,12 @@
 /* prettier-ignore */
 
 {{#each services}}
-import { {{name}}, infos as {{name}}Info } from '../services/{{name}}';
+import { {{name}} } from '../services/{{name}}';
+{{/each}}
+
+{{#if exportApiInformations}}
+{{#each services}}
+    import { infos as {{name}}Info } from '../services/{{name}}';
 {{/each}}
 
 export const ApiInfos = [
@@ -12,6 +17,7 @@ export const ApiInfos = [
     ...{{name}}Info,
 {{/each}}
 ];
+{{/if}}
 
 export const SpecialOperationInfo = {
     {{#each specialOperation}}
