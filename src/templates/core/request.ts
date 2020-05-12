@@ -8,7 +8,6 @@ import { getQueryString } from './getQueryString';
 import { OpenAPI } from './OpenAPI';
 import { RequestOptions } from './RequestOptions';
 import { requestUsingFetch } from './requestUsingFetch';
-import { requestUsingXHR } from './requestUsingXHR';
 import { Result } from './Result';
 
 /**
@@ -35,10 +34,13 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
         credentials: 'same-origin',
     };
 
-    // If we have a bearer token then we set the authentication header.
-    if (OpenAPI.TOKEN !== null && OpenAPI.TOKEN !== '') {
-        headers.append('Authorization', `Bearer ${OpenAPI.TOKEN}`);
-    }
+    // Loads security configurations for whether to apply handling authentications features.
+    // @TODO: fix to retrieve type.
+    Object.values(OpenAPI.SECURITY).forEach((security: any) => {
+        if (security.in === 'header') {
+            headers.append(security.name, `${OpenAPI.TOKEN}`);
+        }
+    })
 
     // Add the query parameters (if defined).
     if (options.query) {
@@ -64,12 +66,7 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
     }
 
     try {
-        switch (OpenAPI.CLIENT) {
-            case 'xhr':
-                return await requestUsingXHR(url, request, options.responseHeader);
-            default:
-                return await requestUsingFetch(url, request, options.responseHeader);
-        }
+        return await requestUsingFetch(url, request, options.responseHeader);
     } catch (error) {
         return {
             url,

@@ -12,3 +12,7 @@ dist
 archive
 coverage
 test/result
+
+generated
+
+test*.json

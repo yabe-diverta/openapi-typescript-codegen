@@ -3,7 +3,6 @@ import * as mkdirp from 'mkdirp';
 import * as rimraf from 'rimraf';
 
 import { Client } from '../client/interfaces/Client';
-import { HttpClient } from '../index';
 import { Templates } from './readHandlebarsTemplates';
 import { writeClient } from './writeClient';
 
@@ -22,6 +21,7 @@ describe('writeClient', () => {
             version: 'v1',
             models: [],
             services: [],
+            security: {},
         };
 
         const templates: Templates = {
@@ -30,9 +30,10 @@ describe('writeClient', () => {
             schema: () => 'dummy',
             service: () => 'dummy',
             settings: () => 'dummy',
+            apiInfo: () => 'dummy',
         };
 
-        writeClient(client, templates, '/', HttpClient.FETCH, false, true, true, true, true);
+        writeClient(client, templates, '/');
 
         expect(rimrafSync).toBeCalled();
         expect(mkdirpSync).toBeCalled();

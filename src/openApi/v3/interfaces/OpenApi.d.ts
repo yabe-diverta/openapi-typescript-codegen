@@ -15,7 +15,6 @@ export interface OpenApi {
     servers?: OpenApiServer[];
     paths: OpenApiPaths;
     components?: OpenApiComponents;
-    security?: OpenApiSecurityRequirement[];
     tags?: OpenApiTag[];
     externalDocs?: OpenApiExternalDocs;
 }

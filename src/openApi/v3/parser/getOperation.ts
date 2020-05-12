@@ -12,11 +12,14 @@ import { getOperationResponses } from './getOperationResponses';
 import { getOperationResults } from './getOperationResults';
 import { getServiceClassName } from './getServiceClassName';
 import { sortByRequired } from './sortByRequired';
+import { getOperationNameFallback } from './getOperationNameFallback';
+import { getOperationType } from './getOperationType';
+import { OpenApiPath } from '../interfaces/OpenApiPath';
 
-export function getOperation(openApi: OpenApi, url: string, method: string, op: OpenApiOperation): Operation {
+export function getOperation(openApi: OpenApi, url: string, method: string, op: OpenApiOperation, path: OpenApiPath): Operation {
     const serviceName = (op.tags && op.tags[0]) || 'Service';
     const serviceClassName = getServiceClassName(serviceName);
-    const operationNameFallback = `${method}${serviceClassName}`;
+    const operationNameFallback = getOperationNameFallback([method, serviceClassName, url]);
     const operationName = getOperationName(op.operationId || operationNameFallback);
     const operationPath = getOperationPath(url);
 
@@ -24,6 +27,7 @@ export function getOperation(openApi: OpenApi, url: string, method: string, op: 
     const operation: Operation = {
         service: serviceClassName,
         name: operationName,
+        type: getOperationType(path.summary),
         summary: getComment(op.summary),
         description: getComment(op.description),
         deprecated: op.deprecated === true,
@@ -40,6 +44,7 @@ export function getOperation(openApi: OpenApi, url: string, method: string, op: 
         errors: [],
         results: [],
         responseHeader: null,
+        security: op.security,
     };
 
     // Parse the operation parameters (path, query, body, etc).

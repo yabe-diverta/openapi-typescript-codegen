@@ -6,13 +6,21 @@
 interface Config {
     BASE: string;
     VERSION: string;
-    CLIENT: 'fetch' | 'xhr';
     TOKEN: string;
+    SECURITY: { [definedName: string]: object };
 }
 
 export const OpenAPI: Config = {
     BASE: '{{{server}}}',
     VERSION: '{{{version}}}',
-    CLIENT: '{{{httpClient}}}',
     TOKEN: '',
+    SECURITY: {
+    {{#each security}}
+        '{{@key}}': {
+            {{#each this}}
+            '{{@key}}': '{{this}}',
+            {{/each}}
+        },
+    {{/each}}
+    }
 };

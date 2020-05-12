@@ -23,7 +23,7 @@ export function getServices(openApi: OpenApi): Service[] {
                         case Method.PATCH:
                             // Each method contains an OpenAPI operation, we parse the operation
                             const op = path[method]!;
-                            const operation = getOperation(openApi, url, method, op);
+                            const operation = getOperation(openApi, url, method, op, path);
 
                             // If we have already declared a service, then we should fetch that and
                             // append the new method to it. Otherwise we should create a new service object.

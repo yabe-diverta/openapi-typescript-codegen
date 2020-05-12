@@ -14,11 +14,4 @@ describe('getOpenApiSpec', () => {
         const spec = getOpenApiSpec('spec.json');
         expect(spec.message).toEqual('Hello World!');
     });
-
-    it('should read the yaml file', () => {
-        fsExistsSync.mockReturnValue(true);
-        fsReadFileSync.mockReturnValue('message: "Hello World!"');
-        const spec = getOpenApiSpec('spec.yaml');
-        expect(spec.message).toEqual('Hello World!');
-    });
 });

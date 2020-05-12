@@ -116,27 +116,75 @@ export function getModel(openApi: OpenApi, definition: OpenApiSchema, isDefiniti
 
     if (definition.anyOf && definition.anyOf.length) {
         model.export = 'generic';
-        const compositionTypes = definition.anyOf.filter(type => type.$ref).map(type => getType(type.$ref));
-        const composition = compositionTypes
-            .map(type => type.type)
-            .sort()
+        const compositionItems = definition.anyOf
+            .map(d => {
+                return d.anyOf ? ((d.anyOf.map(a => getModel(openApi, a)).flat() as Model[]).flat() as Model[]) : [getModel(openApi, d)];
+            })
+            .flat();
+        const composition = compositionItems
+            .map(t => {
+                if (t.enum.length > 0) {
+                    return t.enum.map(e => e.value).join(' | ');
+                }
+                if (t.properties.length > 0) {
+                    return t.properties.length === 1 ? t.properties.map(p => `{ ${p.name}: ${getType(p.type).type} }`) : `{ ${t.properties.map(p => `${p.name}: ${getType(p.type).type} `)} }`;
+                }
+                return;
+            })
             .join(' | ');
-        model.imports.push(...compositionTypes.map(type => type.base));
         model.type = composition;
         model.base = composition;
+        const iter = compositionItems.reduce((prev, cur) => {
+            return {
+                imports: [...(prev.imports || []), ...cur.imports],
+                extends: [...(prev.extends || []), ...cur.extends],
+                enum: [...(prev.enum || []), ...cur.enum],
+                enums: [...(prev.enums || []), ...cur.enums],
+                properties: [...(prev.properties || []), ...cur.properties],
+            };
+        }, {} as any) as Model;
+        model.imports = iter.imports;
+        model.extends = iter.extends;
+        model.enum = iter.enum;
+        model.enums = iter.enums;
+        model.properties = iter.properties;
         return model;
     }
 
     if (definition.oneOf && definition.oneOf.length) {
         model.export = 'generic';
-        const compositionTypes = definition.oneOf.filter(type => type.$ref).map(type => getType(type.$ref));
-        const composition = compositionTypes
-            .map(type => type.type)
-            .sort()
+        const compositionItems = definition.oneOf
+            .map(d => {
+                return d.oneOf ? ((d.oneOf.map(a => getModel(openApi, a)).flat() as Model[]).flat() as Model[]) : [getModel(openApi, d)];
+            })
+            .flat();
+        const composition = compositionItems
+            .map(t => {
+                if (t.enum.length > 0) {
+                    return t.enum.map(e => e.value).join(' | ');
+                }
+                if (t.properties.length > 0) {
+                    return t.properties.length === 1 ? t.properties.map(p => `{ ${p.name}: ${getType(p.type).type} }`) : `{ ${t.properties.map(p => `${p.name}: ${getType(p.type).type} `)} }`;
+                }
+                return;
+            })
             .join(' | ');
-        model.imports.push(...compositionTypes.map(type => type.base));
         model.type = composition;
         model.base = composition;
+        const iter = compositionItems.reduce((prev, cur) => {
+            return {
+                imports: [...(prev.imports || []), ...cur.imports],
+                extends: [...(prev.extends || []), ...cur.extends],
+                enum: [...(prev.enum || []), ...cur.enum],
+                enums: [...(prev.enums || []), ...cur.enums],
+                properties: [...(prev.properties || []), ...cur.properties],
+            };
+        }, {} as any) as Model;
+        model.imports = iter.imports;
+        model.extends = iter.extends;
+        model.enum = iter.enum;
+        model.enums = iter.enums;
+        model.properties = iter.properties;
         return model;
     }
 

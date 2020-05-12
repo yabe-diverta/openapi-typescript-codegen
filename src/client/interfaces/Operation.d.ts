@@ -5,6 +5,7 @@ import { OperationResponse } from './OperationResponse';
 export interface Operation extends OperationParameters {
     service: string;
     name: string;
+    type: 'LOGIN' | 'LOGOUT' | 'TOKEN' | null;
     summary: string | null;
     description: string | null;
     deprecated: boolean;
@@ -13,4 +14,5 @@ export interface Operation extends OperationParameters {
     errors: OperationError[];
     results: OperationResponse[];
     responseHeader: string | null;
+    security?: OpenApiSecurityRequirement[];
 }

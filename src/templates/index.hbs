@@ -2,33 +2,25 @@
 /* tslint:disable */
 /* eslint-disable */
 /* prettier-ignore */
-{{#if exportCore}}
 
 export { ApiError } from './core/ApiError';
 export { isSuccess } from './core/isSuccess';
 export { OpenAPI } from './core/OpenAPI';
-{{/if}}
-{{#if exportModels}}
-{{#if models}}
 
+{{#if models}}
 {{#each models}}
 export { {{{this}}} } from './models/{{{this}}}';
 {{/each}}
 {{/if}}
-{{/if}}
-{{#if exportSchemas}}
-{{#if models}}
 
+{{#if models}}
 {{#each models}}
 export { ${{{this}}} } from './schemas/${{{this}}}';
 {{/each}}
 {{/if}}
-{{/if}}
-{{#if exportServices}}
-{{#if services}}
 
+{{#if services}}
 {{#each services}}
 export { {{{this}}} } from './services/{{{this}}}';
 {{/each}}
-{{/if}}
 {{/if}}
