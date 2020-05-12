@@ -34,16 +34,13 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
         credentials: 'same-origin',
     };
 
-    // Add Token to request header for RCMS's auth (it's particular for RCMS).
-    if (OpenAPI.TOKEN !== null && OpenAPI.TOKEN !== '') {
-
-        // @TODO: fix to retrieve type.
-        Object.values(OpenAPI.SECURITY).forEach((security: any) => {
-            if (security.in === 'header') {
-                headers.append(security.name, `${OpenAPI.TOKEN}`);
-            }
-        })
-    }
+    // Loads security configurations for whether to apply handling authentications features.
+    // @TODO: fix to retrieve type.
+    Object.values(OpenAPI.SECURITY).forEach((security: any) => {
+        if (security.in === 'header') {
+            headers.append(security.name, `${OpenAPI.TOKEN}`);
+        }
+    })
 
     // Add the query parameters (if defined).
     if (options.query) {

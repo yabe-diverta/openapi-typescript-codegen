@@ -9,6 +9,7 @@ import { writeClientModels } from './writeClientModels';
 import { writeClientSchemas } from './writeClientSchemas';
 import { writeClientServices } from './writeClientServices';
 import { writeClientSettings } from './writeClientSettings';
+import { writeApiInfo } from './writeApiInfo';
 
 function copySupportFile(filePath: string, outputPath: string): void {
     fs.copyFileSync(path.resolve(__dirname, `../../src/templates/${filePath}`), path.resolve(outputPath, filePath));
@@ -48,6 +49,7 @@ export function writeClient(
     if (exportCore) {
         mkdirp.sync(outputPathCore);
         copySupportFile('core/ApiError.ts', outputPath);
+        copySupportFile('core/Auth.ts', outputPath);
         copySupportFile('core/getFormData.ts', outputPath);
         copySupportFile('core/getQueryString.ts', outputPath);
         copySupportFile('core/isSuccess.ts', outputPath);
@@ -60,6 +62,7 @@ export function writeClient(
 
     if (exportServices) {
         mkdirp.sync(outputPathServices);
+        writeApiInfo(client.services, templates, outputPathCore);
         writeClientSettings(client, templates, outputPathCore);
         writeClientServices(client.services, templates, outputPathServices, useOptions);
     }

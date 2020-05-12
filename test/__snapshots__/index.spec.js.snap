@@ -61,6 +61,151 @@ export function catchGenericError(result: Result): void {
 "
 `;
 
+exports[`generation v3 file(./test/result/v3/core/ApiInfo.ts): ./test/result/v3/core/ApiInfo.ts 1`] = `
+"/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+/* prettier-ignore */
+
+import { SimpleService, infos as SimpleServiceInfo } from '../services/SimpleService';
+import { ParametersService, infos as ParametersServiceInfo } from '../services/ParametersService';
+import { DefaultsService, infos as DefaultsServiceInfo } from '../services/DefaultsService';
+import { DuplicateService, infos as DuplicateServiceInfo } from '../services/DuplicateService';
+import { ResponseService, infos as ResponseServiceInfo } from '../services/ResponseService';
+import { TypesService, infos as TypesServiceInfo } from '../services/TypesService';
+import { UploadService, infos as UploadServiceInfo } from '../services/UploadService';
+import { ComplexService, infos as ComplexServiceInfo } from '../services/ComplexService';
+import { MultipartService, infos as MultipartServiceInfo } from '../services/MultipartService';
+import { HeaderService, infos as HeaderServiceInfo } from '../services/HeaderService';
+
+export const ApiInfos = [
+    ...SimpleServiceInfo,
+    ...ParametersServiceInfo,
+    ...DefaultsServiceInfo,
+    ...DuplicateServiceInfo,
+    ...ResponseServiceInfo,
+    ...TypesServiceInfo,
+    ...UploadServiceInfo,
+    ...ComplexServiceInfo,
+    ...MultipartServiceInfo,
+    ...HeaderServiceInfo,
+];
+
+export const SpecialOperationInfo = {
+    login: null,
+    logout: null,
+    token: null,
+}"
+`;
+
+exports[`generation v3 file(./test/result/v3/core/Auth.ts): ./test/result/v3/core/Auth.ts 1`] = `
+"/* tslint:disable */
+import { SpecialOperationInfo } from './ApiInfo';
+
+export class Auth {
+
+  public static async login(param: Parameters<typeof SpecialOperationInfo.login.method>) {
+    Auth.deleteAccessToken();
+    Auth.deleteRefreshToken();
+
+    if (!SpecialOperationInfo.login) {
+        return Promise.resolve();
+    }
+
+    const request = SpecialOperationInfo.login.method(param[0]);
+    const rtn = await request.then(prms => prms.value() as Promise<LoginResponse>);
+    const { grant_token, errors } = rtn;
+
+    if (errors && Array.isArray(errors) && errors.length > 0) {
+        return Promise.reject(errors);
+    }
+
+    return await Auth.createToken({ requestBody: { grant_token } });
+  }
+
+  public static async loginWithStoredToken() {
+    const refreshToken = Auth.getRefreshToken();
+    if (refreshToken === '') {
+      await null;
+      return Promise.reject('no refresh token.');
+    }
+    return await Auth.createToken({ requestBody: { refresh_token } });
+  }
+
+  public static async logout(param: Parameters<typeof SpecialOperationInfo.logout.method>) {
+    if (!SpecialOperationInfo.logout) {
+      return Promise.resolve();
+    }
+    return await SpecialOperationInfo.logout.method(param[0]).finally(() => {
+      Auth.deleteAccessToken();
+      Auth.deleteRefreshToken();
+    });
+  }
+
+  public static async createToken(param: Parameters<typeof SpecialOperationInfo.token.method>) {
+    if (!SpecialOperationInfo.token) {
+      return Promise.resolve();
+    }
+
+    const request = SpecialOperationInfo.token.method(param[0]);
+    const res = await request.then(
+      (prms) => prms.value() as Promise<TokenResponse>,
+    );
+    const { access_token, refresh_token } = res;
+
+    access_token ? Auth.setAccessToken(access_token) : undefined;
+    refresh_token ? Auth.setRefreshToken(refresh_token) : undefined;
+
+    return res;
+  }
+
+  /** get */
+  public static getAccessToken() {
+    return localStorage.getItem(Auth.TokenKeys.accessToken) || '';
+  }
+  public static getRefreshToken() {
+    return localStorage.getItem(Auth.TokenKeys.refreshToken) || '';
+  }
+
+  /** set */
+  public static setAccessToken(token: string) {
+    localStorage.setItem(Auth.TokenKeys.accessToken, token);
+  }
+  public static setRefreshToken(token: string) {
+    localStorage.setItem(Auth.TokenKeys.refreshToken, token);
+  }
+
+  /** delete */
+  public static deleteAccessToken() {
+    localStorage.removeItem(Auth.TokenKeys.accessToken);
+  }
+  public static deleteRefreshToken() {
+    localStorage.removeItem(Auth.TokenKeys.refreshToken);
+  }
+}
+
+export namespace Auth {
+  export enum TokenKeys {
+    accessToken = 'accessToken',
+    refreshToken = 'refreshToken',
+  }
+}
+
+export interface LoginResponse {
+  grant_token: string;
+  status: number;
+  info: any;
+  messages: string[];
+  errors: string[];
+}
+
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+"
+`;
+
 exports[`generation v3 file(./test/result/v3/core/OpenAPI.ts): ./test/result/v3/core/OpenAPI.ts 1`] = `
 "/* istanbul ignore file */
 /* tslint:disable */
@@ -232,16 +377,13 @@ export async function request(options: Readonly<RequestOptions>): Promise<Result
         credentials: 'same-origin',
     };
 
-    // Add Token to request header for RCMS's auth (it's particular for RCMS).
-    if (OpenAPI.TOKEN !== null && OpenAPI.TOKEN !== '') {
-
-        // @TODO: fix to retrieve type.
-        Object.values(OpenAPI.SECURITY).forEach((security: any) => {
-            if (security.in === 'header') {
-                headers.append(security.name, \`\${OpenAPI.TOKEN}\`);
-            }
-        })
-    }
+    // Loads security configurations for whether to apply handling authentications features.
+    // @TODO: fix to retrieve type.
+    Object.values(OpenAPI.SECURITY).forEach((security: any) => {
+        if (security.in === 'header') {
+            headers.append(security.name, \`\${OpenAPI.TOKEN}\`);
+        }
+    })
 
     // Add the query parameters (if defined).
     if (options.query) {
@@ -1924,6 +2066,7 @@ import { ModelWithString } from '../models/ModelWithString';
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class ComplexService {
     /**
@@ -1933,7 +2076,9 @@ export class ComplexService {
      * @throws ApiError
      */
     public static async complexTypes(requestParam: ComplexService.complexTypesRequest): Promise<Array<ModelThatExtends | ModelThatExtendsExtends | ModelWithString>> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/complex\`,
             query: {
@@ -1947,6 +2092,16 @@ export class ComplexService {
                 case 500: throw new ApiError(result, \`500 server error\`);
             }
         }
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -1957,11 +2112,23 @@ export class ComplexService {
      * @throws ApiError
      */
     public static async complexParams(requestParam: ComplexService.complexParamsRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'put',
             path: \`/api/v\${requestParam.apiVersion}/complex/\${requestParam.id}\`,
             body: requestParam.requestBody,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2004,7 +2171,28 @@ export namespace ComplexService {
                 },
             }    };
             export type complexParamsResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString;
-        }"
+        }
+
+        export const infos = [
+            {
+                path: '/api/v\${requestParam.apiVersion}/complex',
+                httpMethod: 'get',
+                class: ComplexService,
+                className: 'ComplexService',
+                method: ComplexService.complexTypes,
+                methodName: 'complexTypes',
+                auth: null,
+            },
+            {
+                path: '/api/v\${requestParam.apiVersion}/complex/\${requestParam.id}',
+                httpMethod: 'put',
+                class: ComplexService,
+                className: 'ComplexService',
+                method: ComplexService.complexParams,
+                methodName: 'complexParams',
+                auth: null,
+            },
+        ];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DefaultsService.ts): ./test/result/v3/services/DefaultsService.ts 1`] = `
@@ -2019,6 +2207,7 @@ import { ModelWithString } from '../models/ModelWithString';
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class DefaultsService {
     /**
@@ -2030,7 +2219,9 @@ export class DefaultsService {
      * @throws ApiError
      */
     public static async callWithDefaultParameters(requestParam: DefaultsService.callWithDefaultParametersRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/defaults\`,
             query: {
@@ -2041,6 +2232,16 @@ export class DefaultsService {
                 'parameterModel': requestParam.parameterModel,
             },
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2064,7 +2265,19 @@ export namespace DefaultsService {
             parameterModel: ModelThatExtends | ModelThatExtendsExtends | ModelWithString | null,
         }    };
         export type callWithDefaultParametersResponse = void;
-    }"
+    }
+
+    export const infos = [
+        {
+            path: '/api/v\${requestParam.apiVersion}/defaults',
+            httpMethod: 'get',
+            class: DefaultsService,
+            className: 'DefaultsService',
+            method: DefaultsService.callWithDefaultParameters,
+            methodName: 'callWithDefaultParameters',
+            auth: null,
+        },
+    ];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./test/result/v3/services/DuplicateService.ts 1`] = `
@@ -2076,16 +2289,29 @@ exports[`generation v3 file(./test/result/v3/services/DuplicateService.ts): ./te
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class DuplicateService {
     /**
      * @throws ApiError
      */
     public static async duplicateName(requestParam: DuplicateService.duplicateNameRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2093,10 +2319,22 @@ export class DuplicateService {
      * @throws ApiError
      */
     public static async duplicateName1(requestParam: DuplicateService.duplicateName1Request): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'post',
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2104,10 +2342,22 @@ export class DuplicateService {
      * @throws ApiError
      */
     public static async duplicateName2(requestParam: DuplicateService.duplicateName2Request): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'put',
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2115,10 +2365,22 @@ export class DuplicateService {
      * @throws ApiError
      */
     public static async duplicateName3(requestParam: DuplicateService.duplicateName3Request): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'delete',
             path: \`/api/v\${requestParam.apiVersion}/duplicate\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2137,7 +2399,46 @@ export namespace DuplicateService {
     export interface duplicateName3Request {
     };
     export type duplicateName3Response = void;
-}"
+}
+
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/duplicate',
+        httpMethod: 'get',
+        class: DuplicateService,
+        className: 'DuplicateService',
+        method: DuplicateService.duplicateName,
+        methodName: 'duplicateName',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/duplicate',
+        httpMethod: 'post',
+        class: DuplicateService,
+        className: 'DuplicateService',
+        method: DuplicateService.duplicateName1,
+        methodName: 'duplicateName1',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/duplicate',
+        httpMethod: 'put',
+        class: DuplicateService,
+        className: 'DuplicateService',
+        method: DuplicateService.duplicateName2,
+        methodName: 'duplicateName2',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/duplicate',
+        httpMethod: 'delete',
+        class: DuplicateService,
+        className: 'DuplicateService',
+        method: DuplicateService.duplicateName3,
+        methodName: 'duplicateName3',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/HeaderService.ts): ./test/result/v3/services/HeaderService.ts 1`] = `
@@ -2149,6 +2450,7 @@ exports[`generation v3 file(./test/result/v3/services/HeaderService.ts): ./test/
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class HeaderService {
     /**
@@ -2156,7 +2458,9 @@ export class HeaderService {
      * @throws ApiError
      */
     public static async callWithResultFromHeader(requestParam: HeaderService.callWithResultFromHeaderRequest): Promise<string> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'post',
             path: \`/api/v\${requestParam.apiVersion}/header\`,
             responseHeader: 'operation-location',
@@ -2167,6 +2471,16 @@ export class HeaderService {
                 case 500: throw new ApiError(result, \`500 server error\`);
             }
         }
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2176,7 +2490,19 @@ export namespace HeaderService {
     export interface callWithResultFromHeaderRequest {
     };
     export type callWithResultFromHeaderResponse = string;
-}"
+}
+
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/header',
+        httpMethod: 'post',
+        class: HeaderService,
+        className: 'HeaderService',
+        method: HeaderService.callWithResultFromHeader,
+        methodName: 'callWithResultFromHeader',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/MultipartService.ts): ./test/result/v3/services/MultipartService.ts 1`] = `
@@ -2188,6 +2514,7 @@ exports[`generation v3 file(./test/result/v3/services/MultipartService.ts): ./te
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class MultipartService {
     /**
@@ -2201,10 +2528,22 @@ export class MultipartService {
             bar?: string,
         },
     }> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/multipart\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2220,7 +2559,19 @@ export namespace MultipartService {
             bar?: string,
         },
     };
-}"
+}
+
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/multipart',
+        httpMethod: 'get',
+        class: MultipartService,
+        className: 'MultipartService',
+        method: MultipartService.multipartResponse,
+        methodName: 'multipartResponse',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/ParametersService.ts): ./test/result/v3/services/ParametersService.ts 1`] = `
@@ -2235,6 +2586,7 @@ import { ModelWithString } from '../models/ModelWithString';
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class ParametersService {
     /**
@@ -2246,7 +2598,9 @@ export class ParametersService {
      * @throws ApiError
      */
     public static async callWithParameters(requestParam: ParametersService.callWithParametersRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/parameters\`,
             cookies: {
@@ -2263,6 +2617,16 @@ export class ParametersService {
             },
             body: requestParam.requestBody,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2278,7 +2642,9 @@ export class ParametersService {
      * @throws ApiError
      */
     public static async callWithWeirdParameterNames(requestParam: ParametersService.callWithWeirdParameterNamesRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/parameters/\${requestParam.parameterPath1}/\${requestParam.parameterPath2}/\${requestParam.parameterPath3}\`,
             cookies: {
@@ -2295,6 +2661,16 @@ export class ParametersService {
             },
             body: requestParam.requestBody,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2304,7 +2680,9 @@ export class ParametersService {
      * @throws ApiError
      */
     public static async getCallWithOptionalParam(requestParam: ParametersService.getCallWithOptionalParamRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/parameters/\`,
             query: {
@@ -2312,6 +2690,16 @@ export class ParametersService {
             },
             body: requestParam.requestBody,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2321,7 +2709,9 @@ export class ParametersService {
      * @throws ApiError
      */
     public static async postCallWithOptionalParam(requestParam: ParametersService.postCallWithOptionalParamRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'post',
             path: \`/api/v\${requestParam.apiVersion}/parameters/\`,
             query: {
@@ -2329,6 +2719,16 @@ export class ParametersService {
             },
             body: requestParam.requestBody,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2389,7 +2789,46 @@ export namespace ParametersService {
                         requestBody?: ModelThatExtends | ModelThatExtendsExtends | ModelWithString,
                     }    };
                     export type postCallWithOptionalParamResponse = void;
-                }"
+                }
+
+                export const infos = [
+                    {
+                        path: '/api/v\${requestParam.apiVersion}/parameters',
+                        httpMethod: 'get',
+                        class: ParametersService,
+                        className: 'ParametersService',
+                        method: ParametersService.callWithParameters,
+                        methodName: 'callWithParameters',
+                        auth: null,
+                    },
+                    {
+                        path: '/api/v\${requestParam.apiVersion}/parameters/\${requestParam.parameterPath1}/\${requestParam.parameterPath2}/\${requestParam.parameterPath3}',
+                        httpMethod: 'get',
+                        class: ParametersService,
+                        className: 'ParametersService',
+                        method: ParametersService.callWithWeirdParameterNames,
+                        methodName: 'callWithWeirdParameterNames',
+                        auth: null,
+                    },
+                    {
+                        path: '/api/v\${requestParam.apiVersion}/parameters/',
+                        httpMethod: 'get',
+                        class: ParametersService,
+                        className: 'ParametersService',
+                        method: ParametersService.getCallWithOptionalParam,
+                        methodName: 'getCallWithOptionalParam',
+                        auth: null,
+                    },
+                    {
+                        path: '/api/v\${requestParam.apiVersion}/parameters/',
+                        httpMethod: 'post',
+                        class: ParametersService,
+                        className: 'ParametersService',
+                        method: ParametersService.postCallWithOptionalParam,
+                        methodName: 'postCallWithOptionalParam',
+                        auth: null,
+                    },
+                ];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/ResponseService.ts): ./test/result/v3/services/ResponseService.ts 1`] = `
@@ -2404,6 +2843,7 @@ import { ModelWithString } from '../models/ModelWithString';
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class ResponseService {
     /**
@@ -2411,10 +2851,22 @@ export class ResponseService {
      * @throws ApiError
      */
     public static async callWithResponse(requestParam: ResponseService.callWithResponseRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2423,7 +2875,9 @@ export class ResponseService {
      * @throws ApiError
      */
     public static async callWithDuplicateResponses(requestParam: ResponseService.callWithDuplicateResponsesRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'post',
             path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
@@ -2434,6 +2888,16 @@ export class ResponseService {
                 case 502: throw new ApiError(result, \`Message for 502 error\`);
             }
         }
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2444,7 +2908,9 @@ export class ResponseService {
      * @throws ApiError
      */
     public static async callWithResponses(requestParam: ResponseService.callWithResponsesRequest): Promise<ModelThatExtends | ModelThatExtendsExtends | ModelWithString | ModelThatExtends | ModelThatExtendsExtends | ModelThatExtendsExtends> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'put',
             path: \`/api/v\${requestParam.apiVersion}/response\`,
         });
@@ -2455,6 +2921,16 @@ export class ResponseService {
                 case 502: throw new ApiError(result, \`Message for 502 error\`);
             }
         }
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2470,7 +2946,37 @@ export namespace ResponseService {
     export interface callWithResponsesRequest {
     };
     export type callWithResponsesResponse = ModelThatExtends | ModelThatExtendsExtends | ModelWithString | ModelThatExtends | ModelThatExtendsExtends | ModelThatExtendsExtends;
-}"
+}
+
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/response',
+        httpMethod: 'get',
+        class: ResponseService,
+        className: 'ResponseService',
+        method: ResponseService.callWithResponse,
+        methodName: 'callWithResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/response',
+        httpMethod: 'post',
+        class: ResponseService,
+        className: 'ResponseService',
+        method: ResponseService.callWithDuplicateResponses,
+        methodName: 'callWithDuplicateResponses',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/response',
+        httpMethod: 'put',
+        class: ResponseService,
+        className: 'ResponseService',
+        method: ResponseService.callWithResponses,
+        methodName: 'callWithResponses',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/SimpleService.ts): ./test/result/v3/services/SimpleService.ts 1`] = `
@@ -2482,16 +2988,29 @@ exports[`generation v3 file(./test/result/v3/services/SimpleService.ts): ./test/
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class SimpleService {
     /**
      * @throws ApiError
      */
     public static async getCallWithoutParametersAndResponse(requestParam: SimpleService.getCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2499,10 +3018,22 @@ export class SimpleService {
      * @throws ApiError
      */
     public static async putCallWithoutParametersAndResponse(requestParam: SimpleService.putCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'put',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2510,10 +3041,22 @@ export class SimpleService {
      * @throws ApiError
      */
     public static async postCallWithoutParametersAndResponse(requestParam: SimpleService.postCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'post',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2521,10 +3064,22 @@ export class SimpleService {
      * @throws ApiError
      */
     public static async deleteCallWithoutParametersAndResponse(requestParam: SimpleService.deleteCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'delete',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2532,10 +3087,22 @@ export class SimpleService {
      * @throws ApiError
      */
     public static async optionsCallWithoutParametersAndResponse(requestParam: SimpleService.optionsCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'options',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2543,10 +3110,22 @@ export class SimpleService {
      * @throws ApiError
      */
     public static async headCallWithoutParametersAndResponse(requestParam: SimpleService.headCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'head',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2554,10 +3133,22 @@ export class SimpleService {
      * @throws ApiError
      */
     public static async patchCallWithoutParametersAndResponse(requestParam: SimpleService.patchCallWithoutParametersAndResponseRequest): Promise<void> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'patch',
             path: \`/api/v\${requestParam.apiVersion}/simple\`,
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2585,7 +3176,73 @@ export namespace SimpleService {
     export interface patchCallWithoutParametersAndResponseRequest {
     };
     export type patchCallWithoutParametersAndResponseResponse = void;
-}"
+}
+
+export const infos = [
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'get',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.getCallWithoutParametersAndResponse,
+        methodName: 'getCallWithoutParametersAndResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'put',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.putCallWithoutParametersAndResponse,
+        methodName: 'putCallWithoutParametersAndResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'post',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.postCallWithoutParametersAndResponse,
+        methodName: 'postCallWithoutParametersAndResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'delete',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.deleteCallWithoutParametersAndResponse,
+        methodName: 'deleteCallWithoutParametersAndResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'options',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.optionsCallWithoutParametersAndResponse,
+        methodName: 'optionsCallWithoutParametersAndResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'head',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.headCallWithoutParametersAndResponse,
+        methodName: 'headCallWithoutParametersAndResponse',
+        auth: null,
+    },
+    {
+        path: '/api/v\${requestParam.apiVersion}/simple',
+        httpMethod: 'patch',
+        class: SimpleService,
+        className: 'SimpleService',
+        method: SimpleService.patchCallWithoutParametersAndResponse,
+        methodName: 'patchCallWithoutParametersAndResponse',
+        auth: null,
+    },
+];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/TypesService.ts): ./test/result/v3/services/TypesService.ts 1`] = `
@@ -2597,6 +3254,7 @@ exports[`generation v3 file(./test/result/v3/services/TypesService.ts): ./test/r
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class TypesService {
     /**
@@ -2615,7 +3273,9 @@ export class TypesService {
      * @throws ApiError
      */
     public static async types(requestParam: TypesService.typesRequest): Promise<number | string | boolean | any> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'get',
             path: \`/api/v\${requestParam.apiVersion}/types\`,
             query: {
@@ -2628,6 +3288,16 @@ export class TypesService {
                 'parameterEnum': requestParam.parameterEnum,
             },
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2655,7 +3325,19 @@ export namespace TypesService {
             id?: number,
         }    };
         export type typesResponse = number | string | boolean | any;
-    }"
+    }
+
+    export const infos = [
+        {
+            path: '/api/v\${requestParam.apiVersion}/types',
+            httpMethod: 'get',
+            class: TypesService,
+            className: 'TypesService',
+            method: TypesService.types,
+            methodName: 'types',
+            auth: null,
+        },
+    ];"
 `;
 
 exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/result/v3/services/UploadService.ts 1`] = `
@@ -2667,6 +3349,7 @@ exports[`generation v3 file(./test/result/v3/services/UploadService.ts): ./test/
 import { ApiError, catchGenericError } from '../core/ApiError';
 import { request as __request } from '../core/request';
 import { OpenAPI } from '../core/OpenAPI';
+import { Auth } from '../core/Auth';
 
 export class UploadService {
     /**
@@ -2675,13 +3358,25 @@ export class UploadService {
      * @throws ApiError
      */
     public static async uploadFile(requestParam: UploadService.uploadFileRequest): Promise<boolean> {
-        const result = await __request({
+
+        const request = async () =>
+        await __request({
             method: 'post',
             path: \`/api/v\${requestParam.apiVersion}/upload\`,
             formData: {
                 'file': requestParam.file,
             },
         });
+
+        const shouldHookToken = Object.values(security).find((v: any) => v.type === 'apiKey');
+
+        const result = await request().then(result => {
+            if (shouldHookToken && result.status === 401) {
+                return Auth.loginWithStoredToken().then(async r => (r.ok ? await request() : Promise.resolve(r)));
+            }
+            return result;
+        });
+
         catchGenericError(result);
         return result.body;
     }
@@ -2695,5 +3390,17 @@ export namespace UploadService {
             file: File,
         }    };
         export type uploadFileResponse = boolean;
-    }"
+    }
+
+    export const infos = [
+        {
+            path: '/api/v\${requestParam.apiVersion}/upload',
+            httpMethod: 'post',
+            class: UploadService,
+            className: 'UploadService',
+            method: UploadService.uploadFile,
+            methodName: 'uploadFile',
+            auth: null,
+        },
+    ];"
 `;
