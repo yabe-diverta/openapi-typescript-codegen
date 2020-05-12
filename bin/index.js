@@ -10,7 +10,6 @@ program
     .version(pkg.version)
     .option('--input [value]', 'Path to swagger specification', './spec.json')
     .option('--output [value]', 'Output directory', './generated')
-    .option('--useUnionTypes', 'Use inclusive union types', false)
     .option('--exportSchemas', 'Generate schemas', false)
     .parse(process.argv);
 
@@ -20,7 +19,6 @@ if (OpenAPI) {
     OpenAPI.generate({
         input: program.input,
         output: program.output,
-        useUnionTypes: program.useUnionTypes,
         exportSchemas: program.exportSchemas,
     });
 }

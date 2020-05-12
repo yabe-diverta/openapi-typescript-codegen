@@ -8,7 +8,6 @@ import { writeClient } from './utils/writeClient';
 export interface Options {
     input: string | Record<string, any>;
     output: string;
-    useUnionTypes?: boolean;
     exportSchemas?: boolean;
     write?: boolean;
 }
@@ -19,18 +18,17 @@ export interface Options {
  * service layer, etc.
  * @param input The relative location of the OpenAPI spec.
  * @param output The relative location of the output directory.
- * @param useUnionTypes Use inclusive union types.
  * @param exportSchemas: Generate schemas.
  * @param write Write the files to disk (true or false).
  */
-export function generate({ input, output, useUnionTypes = false, exportSchemas = false, write = true }: Options): void {
+export function generate({ input, output, exportSchemas = false, write = true }: Options): void {
     try {
         // Load the specification, load the handlebar templates for the given language
         const openApi = isString(input) ? getOpenApiSpec(input) : input;
         const templates = readHandlebarsTemplates();
 
         const client = parseV3(openApi);
-        const clientFinal = postProcessClient(client, useUnionTypes);
+        const clientFinal = postProcessClient(client);
         if (write) {
             writeClient(clientFinal, templates, output, exportSchemas);
         }

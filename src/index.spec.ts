@@ -5,7 +5,6 @@ describe('index', () => {
         OpenAPI.generate({
             input: './test/mock/v3/spec.json',
             output: './test/result/v3/',
-            useUnionTypes: true,
             write: false,
         });
     });
